@@ -24,14 +24,11 @@ class ChildFolderSerializer(serializers.ModelSerializer):
 
 class FileSerializer(serializers.ModelSerializer):
     icon = serializers.SerializerMethodField(required=False)
-    folder_id = serializers.SerializerMethodField(required=False)
-    name = serializers.SerializerMethodField(required=False)
-    extention = serializers.SerializerMethodField(required=False)
 
     class Meta:
         model = File
-        fields = ('id', 'folder_id', 'name', 'extention',
+        fields = ('id', 'folder',
                   'created', 'icon', 'file')
 
     def get_icon(self, obj):
-        return obj.extention
+        return obj.file.name

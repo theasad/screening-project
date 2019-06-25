@@ -1,6 +1,9 @@
 from email.policy import default
+from enum import unique
+from locale import format
 
 from django.db import models
+from django.template.defaultfilters import lower
 
 from apps.drive.query_manager import FileQuerySet, FolderQuerySet
 
@@ -19,20 +22,44 @@ class Folder(models.Model):
     def __str__(self):
         return self.name  # return folder name
 
+    def get_linemanagers(self):
+        if self.parent is None:
+            return Folder.objects.none()
+        return Folder.objects.filter(pk=self.parent.pk) | self.parent. get_linemanagers()
 
-# def file_directory_path(instance, filename):
-#     print('sbfjksdbbsdkfbsdkfbdskf')
-#     print(instance)
-#     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-#     return 'drive/{0}/{1}'.format(instance.folder, filename)
+
+def get_folder_list(folder):
+    return folder.get_linemanagers()
+
+
+def file_directory_path(instance, filename):
+    print('++++++++++++++++++++++++++++++++++++')
+    print(get_folder_list(instance.folder))
+    print('++++++++++++++++++++++++++++++++++++')
+
+    folders = instance.folder.get_linemanagers()
+    count = 0
+    folder_dir = ''
+    for folder in folders:
+        print('++++++++++++++++++++++++++++++++++++')
+        print(folder)
+        if count > 0:
+            folder_dir += folder.name + '/'
+        else:
+            folder_dir = folder.name + '/'
+        count = count+1
+    folder_dir += instance.folder.name + '/'
+    return 'drive/{0}/{1}'.format(folder_dir, filename)
 
 
 class File(models.Model):
     folder = models.ForeignKey(
         Folder, related_name='files', on_delete=models.CASCADE)
-    name = models.CharField(max_length=150)
-    file = models.FileField()
-    extention = models.CharField(max_length=10, null=True, default=None)
+    file = models.FileField(
+        upload_to=file_directory_path, unique=True)
     created = models.DateTimeField(auto_now_add=True)
 
     objects = FileQuerySet.as_manager()
+
+    def __str__(self):
+        return self.file.name
