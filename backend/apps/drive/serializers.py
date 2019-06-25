@@ -2,14 +2,20 @@ from rest_framework import serializers
 from apps.drive.models import Folder
 
 
-# Create Folder serializer
 class FolderSerializer(serializers.ModelSerializer):
-    childs = serializers.SerializerMethodField()
 
     class Meta:
         model = Folder
-        fields = ('id', 'name', 'color', 'parent', 'childs')
+        fields = ('id', 'name', 'color', 'parent')
 
-    def get_childs(self, obj):
-        serializer = FolderSerializer(obj.child.all(), many=True)
+
+class ChildFolderSerializer(serializers.ModelSerializer):
+    children = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Folder
+        fields = ('id', 'name', 'color', 'parent', 'children')
+
+    def get_children(self, obj):
+        serializer = FolderSerializer(obj.children.all(), many=True)
         return serializer.data

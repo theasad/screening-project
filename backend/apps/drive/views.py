@@ -1,12 +1,16 @@
-from rest_framework import viewsets
+from django.http import Http404
+from rest_framework import generics, status
+from rest_framework.response import Response
 
 from apps.drive.models import Folder
-from apps.drive.serializers import FolderSerializer
-
-# Create List Viewset.
+from apps.drive.serializers import (ChildFolderSerializer, FolderSerializer)
 
 
-class FolderViewSet(viewsets.ModelViewSet):
-    queryset = Folder.objects.parent().prefetch_related('child')
+class FolderViewSet(generics.ListCreateAPIView):
+    queryset = Folder.objects.parents()
     serializer_class = FolderSerializer
-    permission_classes = ()
+
+
+class FolderDetailsViewSet(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Folder.objects.all()
+    serializer_class = ChildFolderSerializer

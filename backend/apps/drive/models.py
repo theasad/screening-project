@@ -11,6 +11,10 @@ class Folder(models.Model):
     color = models.CharField(max_length=20, blank=True,
                              null=True)  # Folder and text color
     parent = models.ForeignKey('self', blank=True, null=True,
-                               related_name='child', on_delete=models.CASCADE)  # parent folder id for nexted/Child folder
+                               related_name='children', on_delete=models.CASCADE)  # parent folder id for nexted/Child folder
+    created = models.DateTimeField(auto_now_add=True)
 
     objects = FolderQuerySet.as_manager()
+
+    def __str__(self):
+        return self.name  # return folder name
