@@ -53,7 +53,7 @@ class File(models.Model):
         Folder, related_name='files', on_delete=models.CASCADE)
     name = models.CharField(max_length=255, null=True, blank=True)
     file = models.FileField(
-        upload_to=file_directory_path, unique=True)
+        upload_to=file_directory_path)
     created = models.DateTimeField(auto_now_add=True)
 
     objects = FileQuerySet.as_manager()
