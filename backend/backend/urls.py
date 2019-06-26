@@ -22,7 +22,7 @@ from django.urls import include, path, re_path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    re_path('api/v1/', include('drive.urls')),
+    re_path('api/v1/drive/', include('drive.urls')),
 ]
 
 
