@@ -1,0 +1,6 @@
+.vscode
+XDG_CACHE_HOME
+db.sqlite3
+__pycache__
+venv
+media/*
