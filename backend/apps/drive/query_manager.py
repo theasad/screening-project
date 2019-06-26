@@ -10,3 +10,7 @@ class FolderQuerySet(models.QuerySet):
     # Get only child folder
     def children(self):
         return self.filter(parent__isnull=False)
+
+
+class FileQuerySet(models.QuerySet):
+    pass
