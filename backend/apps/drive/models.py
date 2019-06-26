@@ -4,11 +4,9 @@ from locale import format
 from django.utils.text import slugify
 from django.db import models
 from django.template.defaultfilters import lower
-from apps.drive.unitls import unique_slugify
+from apps.drive.utils import unique_slugify, get_media_filesize
 from apps.drive.query_manager import FileQuerySet, FolderQuerySet
 import os
-
-# Create Folder Model
 
 
 class Folder(models.Model):
@@ -24,13 +22,16 @@ class Folder(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
+            # Generate an unique slug using folder name for a folder and save it
             unique_slugify(self, self.name)
         super(Folder, self).save(**kwargs)
 
     def __str__(self):
-        return self.name  # return folder name
+        return self.name
 
     def get_parentfolders(self):
+        # This return a folder all parent folders
+
         if self.parent is None:
             return Folder.objects.none()
         return Folder.objects.filter(pk=self.parent.pk) | self.parent.get_parentfolders()
@@ -40,8 +41,9 @@ class Folder(models.Model):
 
 
 def file_directory_path(instance, filename):
-    folders = instance.folder.get_parentfolders()
+    # This generate a directory where save all uploaded file
 
+    folders = instance.folder.get_parentfolders()
     parent_folder = list(folders.values_list('slug', flat=True))
     folder_list = parent_folder+[instance.folder.slug]
     destination_folder = "/".join(folder_list)
@@ -62,11 +64,8 @@ class File(models.Model):
         self.name = os.path.basename(self.file.name)
         super(File, self).save(**kwargs)
 
-    # def filename(self):
-    #     return os.path.basename(self.file.name)
-
     def __str__(self):
-        return os.path.basename(self.file.name)
+        return self.name
 
     class Meta:
         ordering = ['-created']

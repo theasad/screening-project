@@ -1,4 +1,7 @@
+import os
 import re
+
+from django.conf import settings
 from django.template.defaultfilters import slugify
 
 
@@ -70,3 +73,44 @@ def _slug_strip(value, separator='-'):
             re_sep = re.escape(separator)
         value = re.sub(r'^%s+|%s+$' % (re_sep, re_sep), '', value)
     return value
+
+
+def get_media_filesize(file):
+    unit = 'bytes'
+    size = 0
+    file_dir = f"{settings.MEDIA_ROOT}/{file}"
+    if os.path.exists(file_dir):
+        size = os.path.getsize(file_dir)
+        size, unit = (size/1024, 'KB') if size >= 1024 else (size, unit)
+
+        size, unit = (size/1024, 'MB') if size >= 1024 else (size, unit)
+
+        size, unit = (size/1024, 'GB') if size >= 1024 else (size, unit)
+        size = round(size, 2)
+        size_str = f"{size} {unit}"
+    else:
+        size_str = f"{size} {unit}"
+
+    return size_str
+
+
+def get_file_icon(request, filename):
+    name_split = filename.split('.')
+    icon_name = 'file'
+    icon_name = name_split[-1].lower()
+    if len(name_split) > 1:
+        if icon_name in ['jpg', 'jpeg']:
+            icon_name = 'jpg'
+        elif icon_name in ['doc', 'docx']:
+            icon_name = 'word'
+        elif icon_name in ['ppt', 'pptx']:
+            icon_name = 'powerpoint'
+
+        icon_dir = f"{settings.STATIC_ROOT}/icons/{icon_name}.png"
+
+        # Check file or directory
+        is_file = os.path.exists(icon_dir)
+        if not is_file:
+            icon_name = 'file'
+    icon_url = f"{settings.FILE_ICON_URL}{icon_name}.png"
+    return request.build_absolute_uri(icon_url)

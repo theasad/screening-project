@@ -5,6 +5,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from rest_framework import serializers
 
 from apps.drive.models import File, Folder
+from apps.drive.utils import get_media_filesize, get_file_icon
 
 
 class FolderSerializer(serializers.ModelSerializer):
@@ -59,42 +60,29 @@ class ChildFolderSerializer(serializers.ModelSerializer):
 
 class FileSerializer(serializers.ModelSerializer):
     icon = serializers.SerializerMethodField()
-    breadcrumb_folders = serializers.SerializerMethodField(read_only=True)
+    # breadcrumb_folders = serializers.SerializerMethodField(read_only=True)
     name = serializers.CharField(read_only=True)
+    size = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = File
         fields = ('id', 'folder',
-                  'created', 'icon', 'file', 'name', 'breadcrumb_folders')
+                  'created', 'icon', 'file', 'size', 'name')
 
     def get_icon(self, obj):
-        name_split = obj.file.name.split('.')
-        icon_name = 'file'
-        if len(name_split) > 1:
-            icon_name = obj.file.name.split('.')[-1].lower()
-            if icon_name in ['jpg', 'jpeg']:
-                icon_name = 'jpg'
-            elif icon_name in ['doc', 'docx']:
-                icon_name = 'word'
-            elif icon_name in ['ppt', 'pptx']:
-                icon_name = 'powerpoint'
+        icon_link = get_file_icon(self.context['request'], obj.name)
+        return icon_link
 
-            icon_dir = f"{settings.STATIC_ROOT}/icons/{icon_name}.png"
+    def get_size(self, obj):
+        size_str = get_media_filesize(obj.file.name)
+        return size_str
 
-            # Check file or directory
-            is_file = os.path.isfile(icon_dir)
-            if not is_file:
-                icon_name = 'file'
-
-        icon_url = f"{settings.FILE_ICON_URL}{icon_name}.png"
-        return self.context['request'].build_absolute_uri(icon_url)
-
-    def get_breadcrumb_folders(self, obj):
-        current = FolderSerializer(obj.folder)
-        serializer = FolderSerializer(
-            obj.folder.get_parentfolders(), many=True)
-        response = {
-            'parents': serializer.data,
-            'active': current.data
-        }
+    # def get_breadcrumb_folders(self, obj):
+    #     current = FolderSerializer(obj.folder)
+    #     serializer = FolderSerializer(
+    #         obj.folder.get_parentfolders(), many=True)
+    #     response = {
+    #         'parents': serializer.data,
+    #         'active': current.data
+    #     }
         return response
