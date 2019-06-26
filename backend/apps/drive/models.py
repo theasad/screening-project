@@ -1,16 +1,19 @@
 from email.policy import default
 from enum import unique
 from locale import format
-
+from django.utils.text import slugify
 from django.db import models
 from django.template.defaultfilters import lower
-
+from apps.drive.unitls import unique_slugify
 from apps.drive.query_manager import FileQuerySet, FolderQuerySet
-
+import os
 
 # Create Folder Model
+
+
 class Folder(models.Model):
     name = models.CharField(max_length=100)  # Folder name
+    slug = models.SlugField(max_length=50, null=True, blank=True, unique=True)
     color = models.CharField(max_length=20, blank=True,
                              null=True)  # Folder and text color
     parent = models.ForeignKey('self', blank=True, null=True,
@@ -19,47 +22,51 @@ class Folder(models.Model):
 
     objects = FolderQuerySet.as_manager()
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            unique_slugify(self, self.name)
+        super(Folder, self).save(**kwargs)
+
     def __str__(self):
         return self.name  # return folder name
 
-    def get_linemanagers(self):
+    def get_parentfolders(self):
         if self.parent is None:
             return Folder.objects.none()
-        return Folder.objects.filter(pk=self.parent.pk) | self.parent. get_linemanagers()
+        return Folder.objects.filter(pk=self.parent.pk) | self.parent.get_parentfolders()
 
-
-def get_folder_list(folder):
-    return folder.get_linemanagers()
+    class Meta:
+        ordering = ['-created']
 
 
 def file_directory_path(instance, filename):
-    print('++++++++++++++++++++++++++++++++++++')
-    print(get_folder_list(instance.folder))
-    print('++++++++++++++++++++++++++++++++++++')
+    folders = instance.folder.get_parentfolders()
 
-    folders = instance.folder.get_linemanagers()
-    count = 0
-    folder_dir = ''
-    for folder in folders:
-        print('++++++++++++++++++++++++++++++++++++')
-        print(folder)
-        if count > 0:
-            folder_dir += folder.name + '/'
-        else:
-            folder_dir = folder.name + '/'
-        count = count+1
-    folder_dir += instance.folder.name + '/'
-    return 'drive/{0}/{1}'.format(folder_dir, filename)
+    parent_folder = list(folders.values_list('slug', flat=True))
+    folder_list = parent_folder+[instance.folder.slug]
+    destination_folder = "/".join(folder_list)
+    return f'drive/{destination_folder}/{filename}'
 
 
 class File(models.Model):
     folder = models.ForeignKey(
         Folder, related_name='files', on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, null=True, blank=True)
     file = models.FileField(
         upload_to=file_directory_path, unique=True)
     created = models.DateTimeField(auto_now_add=True)
 
     objects = FileQuerySet.as_manager()
 
+    def save(self, *args, **kwargs):
+        self.name = os.path.basename(self.file.name)
+        super(File, self).save(**kwargs)
+
+    # def filename(self):
+    #     return os.path.basename(self.file.name)
+
     def __str__(self):
-        return self.file.name
+        return os.path.basename(self.file.name)
+
+    class Meta:
+        ordering = ['-created']
