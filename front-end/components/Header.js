@@ -1,19 +1,42 @@
-import React from 'react'
-import Link from 'next/link'
+import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
+import { Link } from '../routes'
+const useStyles = makeStyles(theme => ({
+    root: {
+        flexGrow: 1,
+    },
+    menuButton: {
+        marginRight: theme.spacing(2),
+    },
+    title: {
+        flexGrow: 1,
+    },
+    link: {
+        textDecoration: 'none',
+        color: 'white',
+    }
+}));
 
-const linkStyle = {
-    marginRight: 15
-}
+export default function ButtonAppBar() {
+    const classes = useStyles();
 
-export default function Header() {
     return (
-        <div>
-            <Link href="/" >
-                <a style={linkStyle}>Home</a>
-            </Link>
-            <Link href="/details/drive">
-                <a style={linkStyle}>About</a>
-            </Link>
+        <div className={classes.root}>
+            <AppBar position="fixed">
+                <Toolbar>
+                    <Typography variant="h6" className={classes.title}>
+                        <Link route="home"><a className={classes.link}>mDrive</a></Link>
+                    </Typography>
+                    <Button color="inherit">Add New Folder</Button>
+                    <Button color="inherit">Upload file</Button>
+                </Toolbar>
+            </AppBar>
         </div>
-    )
+    );
 }
