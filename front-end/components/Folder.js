@@ -25,11 +25,11 @@ export default function Folder(props) {
         }
     }));
     const classes = useStyles();
-    return <div> <FolderIcon className={classes.driveFolderIcon} /> <span>{props.folder.name}</span></div>
-    // return <Link route='folder' params={{ slug: props.folder.slug }}>
-    //     <a className={classes.folder}>
-    //         <FolderIcon className={classes.driveFolderIcon} /> <span>{props.folder.name}</span>
-    //     </a>
-    // </Link>
+    // return <div> <FolderIcon className={classes.driveFolderIcon} /> <span>{props.folder.name}</span></div>
+    return <Link route='folder' params={{ slug: props.folder.slug }}>
+        <a className={classes.folder}>
+            <FolderIcon className={classes.driveFolderIcon} /> <span>{props.folder.name}</span>
+        </a>
+    </Link>
 
 };

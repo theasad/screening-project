@@ -7,6 +7,6 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from apps.drive import views
 
 urlpatterns = [
-    path('', views.FolderViewSet.as_view()),
-    path('<str:slug>/', views.FolderDetailsViewSet.as_view()),
-    path('<str:slug>/files/', views.FileViewSet.as_view()), ]
+    path('folders/', views.FolderViewSet.as_view()),
+    path('folders/<str:slug>/', views.FolderDetailsViewSet.as_view()),
+    path('folders/<str:slug>/files/', views.FileViewSet.as_view()), ]

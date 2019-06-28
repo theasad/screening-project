@@ -1,14 +1,13 @@
 import React from 'react'
 import { withRouter } from 'next/router';
-import { Button, Box, Grid, GridList, GridListTile, Paper } from '@material-ui/core';
+import { Grid } from '@material-ui/core';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Layout from '../components/Layout.js';
 import axios from 'axios'
 import Head from 'next/head'
 import Config from '../Config.js'
 import { withStyles } from '@material-ui/styles';
-import FolderLink from '../components/Folder'
-import { Router } from '../routes'
+import Folders from '../components/Folders.js';
 
 const useStyles = (theme => ({
     root: {
@@ -44,14 +43,28 @@ class Details extends React.Component {
         this.state = {
             isLoading: false,
             active_folder: {},
-            child_folders: []
+            folders: [],
+            slug: this.props.router.query.slug
         }
     }
-    componentDidMount() {
+    componentWillMount() {
+        this.fetchFolderDetails(this.state.slug)
+    }
+
+    componentWillReceiveProps(nextProps) {
+        console.log(nextProps);
+        if (nextProps.router.query.slug !== this.props.router.query.slug) {
+            const slug = nextProps.router.query.slug
+            this.setState({ slug: slug });
+            this.fetchFolderDetails(slug);
+        }
+    }
+
+    fetchFolderDetails = async (slug) => {
         console.log(this.props)
         this.setState({ isLoading: true });
-        const api_url = `${Config.API_BASE_URL}${this.props.router.query.slug}`
-        axios.get(api_url)
+        const api_url = `${Config.API_BASE_URL}${slug}`
+        await axios.get(api_url)
             .then(response => {
                 const response_data = response.data;
                 const child_folders = response_data.child_folders;
@@ -62,8 +75,9 @@ class Details extends React.Component {
                         'slug': response_data.slug,
                         'id': response_data.id,
                     },
-                    child_folders: child_folders,
-                    isLoading: false
+                    folders: child_folders,
+                    isLoading: false,
+                    slug: slug
                 });
             }).catch(error => {
                 // handle error
@@ -71,16 +85,8 @@ class Details extends React.Component {
             })
     }
 
-    handleClick(slug) {
-        // With route name and params
-        Router.pushRoute('folder', { slug: slug })
-        // // With route URL
-        // Router.pushRoute('/blog/hello-world')
-    }
-
     render() {
-        const { child_folders, isLoading } = this.state
-
+        const { folders, isLoading } = this.state
         const { classes } = this.props;
         if (isLoading) {
             return (
@@ -97,15 +103,7 @@ class Details extends React.Component {
         return (
             <Layout>
                 <Head><title>Home-mDrive</title></Head>
-                <Grid container className={classes.root} spacing={1}>
-                    {child_folders.map(folder => (
-                        <Grid item key={folder.slug} className={classes.gridItem}>
-                            <Paper onClick={this.handleClick(folder.slug)} className={classes.paper}>
-                                <FolderLink classes={classes} folder={folder} />
-                            </Paper>
-                        </Grid>
-                    ))}
-                </Grid>
+                <Folders folders={folders} />
             </Layout>
         )
     }

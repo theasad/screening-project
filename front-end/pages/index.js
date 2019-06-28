@@ -7,7 +7,7 @@ import { withStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Head from 'next/head';
 import Config from '../Config.js'
-
+import Folders from '../components/Folders'
 const useStyles = (theme => ({
     root: {
         display: 'flex',
@@ -46,11 +46,13 @@ class Index extends React.Component {
         };
     }
 
-
-
     componentDidMount() {
+        this.fetchParentFolders()
+    }
+
+    fetchParentFolders = async () => {
         this.setState({ isLoading: true });
-        axios.get(Config.API_BASE_URL)
+        await axios.get(Config.API_BASE_URL)
             .then(response => {
                 const folders = response.data;
                 this.setState({ folders: folders, isLoading: false });
@@ -78,15 +80,7 @@ class Index extends React.Component {
         return (
             <Layout>
                 <Head><title>Home-mDrive</title></Head>
-                <Grid container className={classes.root} spacing={1}>
-                    {folders.map(folder => (
-                        <Grid item key={folder.slug} className={classes.gridItem}>
-                            <Paper className={classes.paper}>
-                                <FolderLink classes={classes} folder={folder} />
-                            </Paper>
-                        </Grid>
-                    ))}
-                </Grid>
+                <Folders folders={folders} />
             </Layout>
         );
     }
