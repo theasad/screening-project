@@ -6,9 +6,8 @@ const useStyles = (theme => ({
     root: {
         display: 'flex',
         flexWrap: 'wrap',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         overflow: 'hidden',
-        backgroundColor: theme.palette.background.paper,
     },
     gridList: {
         width: '100%',
@@ -19,7 +18,8 @@ const useStyles = (theme => ({
     },
     gridItem: {
         margin: theme.spacing(0.75),
-        padding: 0 + '!important'
+        padding: 0 + '!important',
+        minWidth: 162
     },
     loader: {
         display: 'flex',

@@ -43,11 +43,16 @@ class Index extends React.Component {
         this.state = {
             folders: [],
             isLoading: false,
+            breadCrumItems: []
         };
     }
 
     componentDidMount() {
-        this.fetchParentFolders()
+        this.fetchParentFolders();
+
+        this.setState({
+            breadCrumItems: this.getBreadCrumItems()
+        })
     }
 
     fetchParentFolders = async () => {
@@ -62,12 +67,19 @@ class Index extends React.Component {
             })
     }
 
+    getBreadCrumItems() {
+        return {
+            parents: [],
+            active: { name: "Folders" }
+        }
+
+    }
     render() {
-        const { folders, isLoading } = this.state;
+        const { folders, isLoading, breadCrumItems } = this.state;
         const { classes } = this.props;
         if (isLoading) {
             return (
-                <Layout>
+                <Layout breadCrumItems={breadCrumItems}>
                     <Head><title>Home-mDrive</title></Head>
                     <Grid container>
                         <div className={classes.loader}>
@@ -78,7 +90,7 @@ class Index extends React.Component {
             );
         }
         return (
-            <Layout>
+            <Layout breadCrumItems={breadCrumItems}>
                 <Head><title>Home-mDrive</title></Head>
                 <Folders folders={folders} />
             </Layout>

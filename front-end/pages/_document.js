@@ -2,9 +2,15 @@ import React from 'react';
 import Document, { Head, Main, NextScript } from 'next/document';
 import { ServerStyleSheets } from '@material-ui/styles';
 import theme from '../src/theme';
-
+import '../pages/Custom.css'
+const styles = {
+    body: {
+        backgroundColor: theme.palette.grey[100],
+    }
+}
 class MyDocument extends Document {
     render() {
+
         return (
             <html lang="en">
                 <Head>
@@ -24,7 +30,7 @@ class MyDocument extends Document {
                         href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
                     />
                 </Head>
-                <body>
+                <body style={styles.body}>
                     <Main />
                     <NextScript />
                 </body>

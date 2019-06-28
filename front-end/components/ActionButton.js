@@ -6,10 +6,8 @@ import SpeedDial from '@material-ui/lab/SpeedDial';
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
 import { CreateNewFolderOutlined as FolderCreateIcon, CloudUploadOutlined as FileUploadIcon } from '@material-ui/icons';
-import SaveIcon from '@material-ui/icons/Save';
-import PrintIcon from '@material-ui/icons/Print';
-import ShareIcon from '@material-ui/icons/Share';
-import DeleteIcon from '@material-ui/icons/Delete';
+import MenuIcon from '@material-ui/icons/Menu';
+
 
 const styles = theme => ({
     root: {
@@ -28,15 +26,26 @@ const actions = [
 ];
 
 class SpeedDialTooltipOpen extends React.Component {
-    state = {
-        open: false,
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            open: false,
+        };
+    }
+
 
     handleClick = () => {
         this.setState(state => ({
             open: !state.open,
         }));
+
+
     };
+
+    handleItemClick =()=> {
+        this.props.addFolderModalHandler()
+        console.log(this.props);
+    }
 
     handleOpen = () => {
         this.setState({
@@ -59,7 +68,7 @@ class SpeedDialTooltipOpen extends React.Component {
                 <SpeedDial
                     ariaLabel="SpeedDial tooltip example"
                     className={classes.speedDial}
-                    icon={<SpeedDialIcon />}
+                    icon={<MenuIcon />}
                     onBlur={this.handleClose}
                     onClick={this.handleClick}
                     onClose={this.handleClose}
@@ -73,7 +82,7 @@ class SpeedDialTooltipOpen extends React.Component {
                             key={action.name}
                             icon={action.icon}
                             tooltipTitle={action.name}
-                            onClick={this.handleClick}
+                            onClick={this.handleItemClick}
                         />
                     ))}
                 </SpeedDial>

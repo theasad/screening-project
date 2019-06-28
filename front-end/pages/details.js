@@ -25,7 +25,7 @@ const useStyles = (theme => ({
         textAlign: 'left',
     },
     gridItem: {
-        margin: theme.spacing(0.75),
+        margin: 5,
         padding: 0 + '!important'
     },
     loader: {
@@ -42,9 +42,9 @@ class Details extends React.Component {
         super(props);
         this.state = {
             isLoading: false,
-            active_folder: {},
             folders: [],
-            slug: this.props.router.query.slug
+            slug: this.props.router.query.slug,
+            breadCrumItems: []
         }
     }
     componentWillMount() {
@@ -68,29 +68,28 @@ class Details extends React.Component {
             .then(response => {
                 const response_data = response.data;
                 const child_folders = response_data.child_folders;
-                console.log(response)
+                const breadcrumb_folders = response_data.breadcrumb_folders;
+                console.log(breadcrumb_folders)
                 this.setState({
-                    active_folder: {
-                        'name': response_data.name,
-                        'slug': response_data.slug,
-                        'id': response_data.id,
-                    },
                     folders: child_folders,
                     isLoading: false,
-                    slug: slug
+                    slug: slug,
+                    breadCrumItems: breadcrumb_folders
                 });
             }).catch(error => {
                 // handle error
                 console.log(error.message);
             })
+
+        console.log(this.state.breadCrumItems)
     }
 
     render() {
-        const { folders, isLoading } = this.state
+        const { folders, isLoading, breadCrumItems } = this.state
         const { classes } = this.props;
         if (isLoading) {
             return (
-                <Layout>
+                <Layout breadCrumItems={breadCrumItems}>
                     <Head><title>Home-mDrive</title></Head>
                     <Grid container>
                         <div className={classes.loader}>
@@ -101,7 +100,7 @@ class Details extends React.Component {
             );
         }
         return (
-            <Layout>
+            <Layout breadCrumItems={breadCrumItems}>
                 <Head><title>Home-mDrive</title></Head>
                 <Folders folders={folders} />
             </Layout>
