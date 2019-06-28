@@ -50,7 +50,7 @@ class ChildFolderSerializer(serializers.ModelSerializer):
     def get_breadcrumb_folders(self, obj):
         current = FolderSerializer(obj)
         serializer = FolderSerializer(
-            obj.get_parentfolders(), many=True)
+            obj.get_parentfolders().order_by('id'), many=True)
         response = {
             'parents': serializer.data,
             'active': current.data
