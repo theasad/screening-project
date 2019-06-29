@@ -1,8 +1,7 @@
 import React from 'react'
 import Layout from '../components/Layout.js';
 import axios from 'axios';
-import FolderLink from '../components/Folder'
-import { Button, Box, Grid, GridList, GridListTile, Paper } from '@material-ui/core';
+import { Grid } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Head from 'next/head';
@@ -47,7 +46,7 @@ class Index extends React.Component {
         };
     }
 
-    componentDidMount() {
+    componentWillMount() {
         this.fetchParentFolders();
 
         this.setState({
@@ -67,6 +66,13 @@ class Index extends React.Component {
             })
     }
 
+    handlerFolderForm = (data) => {
+        this.setState({
+            ...this.state,
+            folders: [data, ...this.state.folders]
+        })
+    }
+
     getBreadCrumItems() {
         return {
             parents: [],
@@ -74,12 +80,13 @@ class Index extends React.Component {
         }
 
     }
+
     render() {
         const { folders, isLoading, breadCrumItems } = this.state;
         const { classes } = this.props;
         if (isLoading) {
             return (
-                <Layout breadCrumItems={breadCrumItems}>
+                <Layout handlerFolderForm={this.handlerFolderForm} breadCrumItems={breadCrumItems}>
                     <Head><title>Home-mDrive</title></Head>
                     <Grid container>
                         <div className={classes.loader}>
@@ -90,7 +97,7 @@ class Index extends React.Component {
             );
         }
         return (
-            <Layout breadCrumItems={breadCrumItems}>
+            <Layout handlerFolderForm={this.handlerFolderForm} breadCrumItems={breadCrumItems}>
                 <Head><title>Home-mDrive</title></Head>
                 <Folders folders={folders} />
             </Layout>

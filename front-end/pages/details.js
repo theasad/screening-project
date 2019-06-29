@@ -84,12 +84,19 @@ class Details extends React.Component {
         console.log(this.state.breadCrumItems)
     }
 
+    handlerFolderForm = (data) => {
+        this.setState({
+            ...this.state,
+            folders: [data, ...this.state.folders]
+        })
+    }
+
     render() {
         const { folders, isLoading, breadCrumItems } = this.state
         const { classes } = this.props;
         if (isLoading) {
             return (
-                <Layout breadCrumItems={breadCrumItems}>
+                <Layout handlerFolderForm={this.handlerFolderForm} breadCrumItems={breadCrumItems}>
                     <Head><title>Home-mDrive</title></Head>
                     <Grid container>
                         <div className={classes.loader}>
@@ -100,7 +107,7 @@ class Details extends React.Component {
             );
         }
         return (
-            <Layout breadCrumItems={breadCrumItems}>
+            <Layout handlerFolderForm={this.handlerFolderForm} breadCrumItems={breadCrumItems}>
                 <Head><title>Home-mDrive</title></Head>
                 <Folders folders={folders} />
             </Layout>

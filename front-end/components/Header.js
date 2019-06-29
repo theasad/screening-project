@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function ButtonAppBar() {
+export default function ButtonAppBar(props) {
     const classes = useStyles();
 
     return (
@@ -33,7 +33,7 @@ export default function ButtonAppBar() {
                     <Typography variant="h6" className={classes.title}>
                         <Link route="home"><a className={classes.link}>mDrive</a></Link>
                     </Typography>
-                    <Button color="inherit">Add New Folder</Button>
+                    <Button color="inherit" onClick={props.addFolderModalHandler}>Add New Folder</Button>
                     <Button color="inherit">Upload file</Button>
                 </Toolbar>
             </AppBar>
