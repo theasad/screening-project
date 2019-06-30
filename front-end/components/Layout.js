@@ -36,13 +36,13 @@ class Layout extends React.Component {
     }
 
     handlerFolderForm = (data, isSuccess = false) => {
-        let snackBarVaritant = this.state.snackBarVaritant
-        let snackBarMessage = 'Failed to creating folder'
+        let snackBarVaritant = this.state.snackBarVaritant;
+        let snackBarMessage = 'Failed to creating folder';
         if (isSuccess) {
-            snackBarMessage = `Folder successfully created`
+            snackBarMessage = `Folder successfully created`;
             this.setState({ isAddModalOpen: false });
         } else {
-            snackBarVaritant = 'error'
+            snackBarVaritant = 'error';
         }
 
         this.setState({

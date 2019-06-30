@@ -61,15 +61,13 @@ class Details extends React.Component {
     }
 
     fetchFolderDetails = async (slug) => {
-        console.log(this.props)
         this.setState({ isLoading: true });
-        const api_url = `${Config.API_BASE_URL}${slug}`
+        const api_url = `${Config.API_BASE_URL}${slug}`;
         await axios.get(api_url)
             .then(response => {
                 const response_data = response.data;
                 const child_folders = response_data.child_folders;
                 const breadcrumb_folders = response_data.breadcrumb_folders;
-                console.log(breadcrumb_folders)
                 this.setState({
                     folders: child_folders,
                     isLoading: false,
@@ -80,16 +78,14 @@ class Details extends React.Component {
                 // handle error
                 console.log(error.message);
             })
-
-        console.log(this.state.breadCrumItems)
-    }
+    };
 
     handlerFolderForm = (data) => {
         this.setState({
             ...this.state,
             folders: [data, ...this.state.folders]
         })
-    }
+    };
 
     render() {
         const { folders, isLoading, breadCrumItems } = this.state
