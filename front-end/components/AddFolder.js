@@ -13,24 +13,24 @@ import FormLabel from '@material-ui/core/FormLabel';
 import DoneIcon from '@material-ui/icons/Done'
 import Config from '../Config.js'
 import axios from 'axios'
-import  red from '@material-ui/core/colors/red'
-import  pink from '@material-ui/core/colors/pink'
-import  purple from '@material-ui/core/colors/purple'
-import  deepPurple from '@material-ui/core/colors/deepPurple'
-import  indigo from '@material-ui/core/colors/indigo'
-import  blue from '@material-ui/core/colors/blue'
-import  lightBlue from '@material-ui/core/colors/lightBlue'
-import  cyan from '@material-ui/core/colors/cyan'
-import  teal from '@material-ui/core/colors/teal'
-import  green from '@material-ui/core/colors/green'
-import  lightGreen from '@material-ui/core/colors/lightGreen'
-import  lime from '@material-ui/core/colors/lime'
-import  amber from '@material-ui/core/colors/amber'
-import  orange from '@material-ui/core/colors/orange'
-import  deepOrange from '@material-ui/core/colors/deepOrange'
-import  yellow from '@material-ui/core/colors/yellow'
-import  brown from '@material-ui/core/colors/brown'
-import  blueGrey from '@material-ui/core/colors/blueGrey'
+import red from '@material-ui/core/colors/red'
+import pink from '@material-ui/core/colors/pink'
+import purple from '@material-ui/core/colors/purple'
+import deepPurple from '@material-ui/core/colors/deepPurple'
+import indigo from '@material-ui/core/colors/indigo'
+import blue from '@material-ui/core/colors/blue'
+import lightBlue from '@material-ui/core/colors/lightBlue'
+import cyan from '@material-ui/core/colors/cyan'
+import teal from '@material-ui/core/colors/teal'
+import green from '@material-ui/core/colors/green'
+import lightGreen from '@material-ui/core/colors/lightGreen'
+import lime from '@material-ui/core/colors/lime'
+import amber from '@material-ui/core/colors/amber'
+import orange from '@material-ui/core/colors/orange'
+import deepOrange from '@material-ui/core/colors/deepOrange'
+import yellow from '@material-ui/core/colors/yellow'
+import brown from '@material-ui/core/colors/brown'
+import blueGrey from '@material-ui/core/colors/blueGrey'
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -50,8 +50,8 @@ const colors = [
     { name: 'lightGreen', code: lightGreen[500] },
     { name: 'lime', code: lime[500] },
     { name: 'amber', code: amber[500] },
-    { name: 'yellow', code: yellow[900]},
-    { name: 'orange', code: orange[500]},
+    { name: 'yellow', code: yellow[900] },
+    { name: 'orange', code: orange[500] },
     { name: 'deepOrange', code: deepOrange[500] },
     { name: 'brown', code: brown[500] },
     { name: 'blueGrey', code: blueGrey[500] }
@@ -69,8 +69,8 @@ const FormDialog = (props) => {
         open: props.open
     });
     let textInput = React.createRef();
+
     function handleChange(event) {
-        console.log(event)
         if (state['color'] === event.target.value) {
             setState({ ...state, color: "" })
         } else {
@@ -94,7 +94,7 @@ const FormDialog = (props) => {
                 .then(function (response) {
                     if (response.status === 201) {
                         props.handlerFolderForm(response.data, true);
-                        setState({submitBtnText: "Save" });
+                        setState({ submitBtnText: "Save", open: false });
                     } else {
                         props.handlerFolderForm([]);
                         setState({ ...state, isSubmiting: false, submitBtnText: "Save" });
@@ -130,7 +130,6 @@ const FormDialog = (props) => {
     function ColorPicker() {
 
         return colors.map(color => {
-            console.log(color);
             let nameCls = color.name
             const useStylesRadioBox = makeStyles(theme => ({
 
@@ -196,7 +195,7 @@ const FormDialog = (props) => {
 
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleClose} color={red[500]}>
+                        <Button onClick={handleClose}>
                             Cancel
                     </Button>
                         <Button variant="contained" onClick={handleForm} color="primary">

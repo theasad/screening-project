@@ -35,7 +35,7 @@ class Layout extends React.Component {
         })
     }
 
-    handlerFolderForm = (data, isSuccess = false) => {
+    handlerFolderForm=(data, isSuccess = false) =>{
         let snackBarVaritant = this.state.snackBarVaritant;
         let snackBarMessage = 'Failed to creating folder';
         if (isSuccess) {
@@ -76,6 +76,11 @@ class Layout extends React.Component {
         }
     }
 
+    renderBreadcrumbs() {
+        if (this.props.hasOwnProperty('breadCrumItems'))
+            return <Breadcrumbs breadCrumItems={this.props.breadCrumItems} />
+    }
+
     render() {
         const { classes } = this.props;
         return (
@@ -84,7 +89,7 @@ class Layout extends React.Component {
                 <Container maxWidth="lg" >
                     <Header classes={classes} addFolderModalHandler={this.addFolderModalHandler} />
                     <div className={classes.innerContainer}>
-                        <Breadcrumbs breadCrumItems={this.props.breadCrumItems} />
+                        {this.renderBreadcrumbs()}
                         {this.props.children}
                     </div>
                     <ActionButton addFolderModalHandler={this.addFolderModalHandler} />

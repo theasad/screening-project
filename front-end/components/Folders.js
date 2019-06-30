@@ -1,8 +1,8 @@
 import React from 'react'
-import { Button, Box, Grid, GridList, GridListTile, Paper, withStyles } from '@material-ui/core';
+import { Button, Box, Grid, GridList, GridListTile, Paper, withStyles, makeStyles } from '@material-ui/core';
 import Folder from '../components/Folder'
 
-const useStyles = (theme => ({
+const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex',
         flexWrap: 'wrap',
@@ -30,25 +30,26 @@ const useStyles = (theme => ({
     }
 }));
 
-class Folders extends React.Component {
-    render() {
-        const { classes, folders } = this.props;
-        return (
-            <Grid container className={classes.root} spacing={1}>
-                {
-                    folders.map(folder => {
-                        return <Grid item key={folder.slug} className={classes.gridItem}>
-                            <Paper className={classes.paper}>
-                                <Folder classes={classes} folder={folder} />
-                            </Paper>
-                        </Grid>
-                    })
-                }
+function Folders(props) {
 
-            </Grid>
-        )
-    }
+    const { folders } = props;
+    const classes = useStyles();
+    return (
+        <Grid container className={classes.root} spacing={1}>
+            {
+                folders.map(folder => {
+                    return <Grid item key={folder.slug} className={classes.gridItem}>
+                        <Paper className={classes.paper}>
+                            <Folder classes={classes} folder={folder} />
+                        </Paper>
+                    </Grid>
+                })
+            }
+
+        </Grid>
+    )
+
 
 }
 
-export default withStyles(useStyles)(Folders)
+export default Folders

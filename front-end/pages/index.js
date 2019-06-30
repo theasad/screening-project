@@ -7,6 +7,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Head from 'next/head';
 import Config from '../Config.js'
 import Folders from '../components/Folders'
+import Loader from '../components/Loader'
 const useStyles = (theme => ({
     root: {
         display: 'flex',
@@ -46,25 +47,33 @@ class Index extends React.Component {
         };
     }
 
-    componentWillMount() {
-        this.fetchParentFolders();
 
-        this.setState({
-            breadCrumItems: this.getBreadCrumItems()
-        })
-    }
+    // abortController = new AbortController();
+
 
     fetchParentFolders = async () => {
         this.setState({ isLoading: true });
         await axios.get(Config.API_BASE_URL)
             .then(response => {
                 const folders = response.data;
-                this.setState({ folders: folders, isLoading: false });
+                this.setState({ folders: folders, isLoading: false, breadCrumItems: this.getBreadCrumItems() });
             }).catch(error => {
-                // handle error
-                console.log(error);
+                console.log("err", error.name);
+                if (error.name === "AbortError") return;
+                throw error;
             })
     }
+
+    componentDidMount() {
+        this.fetchParentFolders();
+    }
+
+
+
+    // componentWillUnmount() {
+    //     this.abortController.abort();
+    // }
+
 
     handlerFolderForm = (data) => {
         this.setState({
@@ -81,27 +90,25 @@ class Index extends React.Component {
 
     }
 
-    render() {
+    renderContent() {
         const { folders, isLoading, breadCrumItems } = this.state;
-        const { classes } = this.props;
         if (isLoading) {
             return (
-                <Layout handlerFolderForm={this.handlerFolderForm} breadCrumItems={breadCrumItems}>
+                <Layout>
                     <Head><title>Home-mDrive</title></Head>
-                    <Grid container>
-                        <div className={classes.loader}>
-                            <CircularProgress color="secondary" />
-                        </div>
-                    </Grid>
+                    <Loader />
                 </Layout>
             );
-        }
-        return (
-            <Layout handlerFolderForm={this.handlerFolderForm} breadCrumItems={breadCrumItems}>
+        } else {
+            return <Layout handlerFolderForm={this.handlerFolderForm} breadCrumItems={breadCrumItems}>
                 <Head><title>Home-mDrive</title></Head>
                 <Folders folders={folders} />
             </Layout>
-        );
+        }
+    }
+
+    render() {
+        return (this.renderContent())
     }
 }
 

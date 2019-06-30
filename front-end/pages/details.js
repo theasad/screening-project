@@ -7,8 +7,8 @@ import axios from 'axios'
 import Head from 'next/head'
 import Config from '../Config.js'
 import { withStyles } from '@material-ui/styles';
-import Folders from '../components/Folders.js';
-
+import Folders from '../components/Folders';
+import Loader from '../components/Loader';
 const useStyles = (theme => ({
     root: {
         display: 'flex',
@@ -41,7 +41,7 @@ class Details extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isLoading: false,
+            isLoading: true,
             folders: [],
             slug: this.props.router.query.slug,
             breadCrumItems: []
@@ -52,10 +52,8 @@ class Details extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log(nextProps);
         if (nextProps.router.query.slug !== this.props.router.query.slug) {
             const slug = nextProps.router.query.slug
-            this.setState({ slug: slug });
             this.fetchFolderDetails(slug);
         }
     }
@@ -87,27 +85,25 @@ class Details extends React.Component {
         })
     };
 
-    render() {
-        const { folders, isLoading, breadCrumItems } = this.state
-        const { classes } = this.props;
+    renderContent() {
+        const { folders, isLoading, breadCrumItems } = this.state;
         if (isLoading) {
             return (
-                <Layout handlerFolderForm={this.handlerFolderForm} breadCrumItems={breadCrumItems}>
-                    <Head><title>Home-mDrive</title></Head>
-                    <Grid container>
-                        <div className={classes.loader}>
-                            <CircularProgress color="secondary" />
-                        </div>
-                    </Grid>
+                <Layout>
+                    <Head><title>Home-Loading folder</title></Head>
+                    <Loader />
                 </Layout>
             );
-        }
-        return (
-            <Layout handlerFolderForm={this.handlerFolderForm} breadCrumItems={breadCrumItems}>
-                <Head><title>Home-mDrive</title></Head>
+        } else {
+            return <Layout handlerFolderForm={this.handlerFolderForm} breadCrumItems={breadCrumItems}>
+                <Head><title>Home-{breadCrumItems.active.name}</title></Head>
                 <Folders folders={folders} />
             </Layout>
-        )
+        }
+    }
+
+    render() {
+        return (this.renderContent())
     }
 }
 
