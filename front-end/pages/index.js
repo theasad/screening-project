@@ -37,6 +37,7 @@ const useStyles = (theme => ({
 }));
 
 class Index extends React.Component {
+    _isMounted = false;
     constructor(props) {
         super(props)
 
@@ -53,10 +54,13 @@ class Index extends React.Component {
 
     fetchParentFolders = async () => {
         this.setState({ isLoading: true });
+        this._isMounted = true
         await axios.get(Config.API_BASE_URL)
             .then(response => {
                 const folders = response.data;
-                this.setState({ folders: folders, isLoading: false, breadCrumItems: this.getBreadCrumItems() });
+                if (this._isMounted) {
+                    this.setState({ folders: folders, isLoading: false, breadCrumItems: this.getBreadCrumItems() });
+                }
             }).catch(error => {
                 console.log("err", error.name);
                 if (error.name === "AbortError") return;
@@ -70,9 +74,9 @@ class Index extends React.Component {
 
 
 
-    // componentWillUnmount() {
-    //     this.abortController.abort();
-    // }
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
 
 
     handlerFolderForm = (data) => {

@@ -38,6 +38,7 @@ const useStyles = (theme => ({
 }));
 
 class Details extends React.Component {
+    _isMounted = false;
     constructor(props) {
         super(props);
         this.state = {
@@ -47,7 +48,7 @@ class Details extends React.Component {
             breadCrumItems: []
         }
     }
-    componentWillMount() {
+    componentDidMount() {
         this.fetchFolderDetails(this.state.slug)
     }
 
@@ -60,23 +61,31 @@ class Details extends React.Component {
 
     fetchFolderDetails = async (slug) => {
         this.setState({ isLoading: true });
+        this._isMounted = true;
         const api_url = `${Config.API_BASE_URL}${slug}`;
         await axios.get(api_url)
             .then(response => {
                 const response_data = response.data;
                 const child_folders = response_data.child_folders;
                 const breadcrumb_folders = response_data.breadcrumb_folders;
-                this.setState({
-                    folders: child_folders,
-                    isLoading: false,
-                    slug: slug,
-                    breadCrumItems: breadcrumb_folders
-                });
+                if (this._isMounted) {
+                    this.setState({
+                        folders: child_folders,
+                        isLoading: false,
+                        slug: slug,
+                        breadCrumItems: breadcrumb_folders
+                    });
+                }
             }).catch(error => {
                 // handle error
                 console.log(error.message);
             })
     };
+
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
+
 
     handlerFolderForm = (data) => {
         this.setState({
