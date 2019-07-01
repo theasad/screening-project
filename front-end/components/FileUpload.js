@@ -48,7 +48,7 @@ const useStyles = makeStyles(theme => ({
 const FormFileUploadDialog = (props) => {
     const [state, setState] = React.useState({
         file: "",
-        folder: props.opnefolder.hasOwnProperty('id') ? props.opnefolder.id : "",
+        folder: props.openfolder.hasOwnProperty('id') ? props.openfolder.id : "",
         error: false,
         errorText: "",
         isSubmiting: false,
@@ -82,7 +82,7 @@ const FormFileUploadDialog = (props) => {
     return (
         <div>
             <Dialog
-                open={state.open} onClose={handleClose}
+                open={true} onClose={handleClose}
                 aria-labelledby="customized-dialog-title"
                 TransitionComponent={Transition}
                 keepMounted
@@ -103,7 +103,7 @@ const FormFileUploadDialog = (props) => {
 
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleClose} color={red[500]}>
+                        <Button onClick={handleClose}>
                             Cancel
                     </Button>
                         <Button variant="contained" onClick={handleForm} color="primary">

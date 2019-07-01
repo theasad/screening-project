@@ -4,6 +4,7 @@ import { Container, CssBaseline, withStyles } from '@material-ui/core';
 import ActionButton from './ActionButton'
 import Breadcrumbs from '../components/Breadcrumbs'
 import AddFolder from '../components/AddFolder'
+import FormFileUpload from '../components/FileUpload'
 import SnackBar from "../components/SnackBar";
 
 const useStyles = (theme => ({
@@ -35,7 +36,7 @@ class Layout extends React.Component {
         })
     }
 
-    handlerFolderForm=(data, isSuccess = false) =>{
+    handlerFolderForm = (data, isSuccess = false) => {
         let snackBarVaritant = this.state.snackBarVaritant;
         let snackBarMessage = 'Failed to creating folder';
         if (isSuccess) {
@@ -94,6 +95,7 @@ class Layout extends React.Component {
                     </div>
                     <ActionButton addFolderModalHandler={this.addFolderModalHandler} />
                     {this.renderAddForm()}
+                    <FormFileUpload openfolder={this.state.parent} />
                     {this.renderSnackBar()}
                 </Container>
             </Fragment>
