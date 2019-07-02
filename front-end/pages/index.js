@@ -44,7 +44,10 @@ class Index extends React.Component {
         this.state = {
             folders: [],
             isLoading: false,
-            breadCrumItems: []
+            breadCrumItems: {
+                parents: [],
+                active: { name: "Folders" }
+            }
         };
     }
 
@@ -54,7 +57,7 @@ class Index extends React.Component {
 
     fetchParentFolders = async () => {
         this.setState({ isLoading: true });
-        this._isMounted = true
+        this._isMounted = true;
         await axios.get(Config.API_BASE_URL)
             .then(response => {
                 const folders = response.data;
@@ -98,7 +101,7 @@ class Index extends React.Component {
         const { folders, isLoading, breadCrumItems } = this.state;
         if (isLoading) {
             return (
-                <Layout>
+                <Layout breadCrumItems={breadCrumItems}>
                     <Head><title>Home-mDrive</title></Head>
                     <Loader />
                 </Layout>

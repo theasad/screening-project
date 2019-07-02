@@ -7,7 +7,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
 import Radio from '@material-ui/core/Radio';
-import { makeStyles, DialogContentText } from "@material-ui/core";
+import {makeStyles, DialogContentText} from "@material-ui/core";
 import Tooltip from "@material-ui/core/Tooltip";
 import FormLabel from '@material-ui/core/FormLabel';
 import DoneIcon from '@material-ui/icons/Done'
@@ -37,27 +37,28 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 const colors = [
-    { name: 'red', code: red[500] },
-    { name: 'pink', code: pink[500] },
-    { name: 'purple', code: purple[500] },
-    { name: 'deepPurple', code: deepPurple[500] },
-    { name: 'indigo', code: indigo[500] },
-    { name: 'blue', code: blue[500] },
-    { name: 'lightBlue', code: lightBlue[500] },
-    { name: 'cyan', code: cyan[500] },
-    { name: 'teal', code: teal[500] },
-    { name: 'green', code: green[500] },
-    { name: 'lightGreen', code: lightGreen[500] },
-    { name: 'lime', code: lime[500] },
-    { name: 'amber', code: amber[500] },
-    { name: 'yellow', code: yellow[900] },
-    { name: 'orange', code: orange[500] },
-    { name: 'deepOrange', code: deepOrange[500] },
-    { name: 'brown', code: brown[500] },
-    { name: 'blueGrey', code: blueGrey[500] }
+    {name: 'red', code: red[500]},
+    {name: 'pink', code: pink[500]},
+    {name: 'purple', code: purple[500]},
+    {name: 'deepPurple', code: deepPurple[500]},
+    {name: 'indigo', code: indigo[500]},
+    {name: 'blue', code: blue[500]},
+    {name: 'lightBlue', code: lightBlue[500]},
+    {name: 'cyan', code: cyan[500]},
+    {name: 'teal', code: teal[500]},
+    {name: 'green', code: green[500]},
+    {name: 'lightGreen', code: lightGreen[500]},
+    {name: 'lime', code: lime[500]},
+    {name: 'amber', code: amber[500]},
+    {name: 'yellow', code: yellow[900]},
+    {name: 'orange', code: orange[500]},
+    {name: 'deepOrange', code: deepOrange[500]},
+    {name: 'brown', code: brown[500]},
+    {name: 'blueGrey', code: blueGrey[500]}
 ];
 
 const FormDialog = (props) => {
+    let _isMounted = false;
     const [state, setState] = React.useState({
         name: "",
         color: "",
@@ -72,43 +73,47 @@ const FormDialog = (props) => {
 
     function handleChange(event) {
         if (state['color'] === event.target.value) {
-            setState({ ...state, color: "" })
+            setState({...state, color: ""})
         } else {
-            setState({ ...state, color: event.target.value });
+            setState({...state, color: event.target.value});
         }
 
     }
 
     function inputHandle(event) {
-        setState({ ...state, name: event.target.value, error: false, errorText: "" });
+        setState({...state, name: event.target.value, error: false, errorText: ""});
     }
 
     function handleForm(event) {
         if (state.name != "" && !state.error && !state.isSubmiting) {
-            setState({ ...state, isSubmiting: true, submitBtnText: 'Adding' });
+            setState({...state, isSubmiting: true, submitBtnText: 'Adding'});
             delete state.error;
             delete state.errorText;
             if (state.parent == "") delete state.parent;
-
+            _isMounted = true;
             axios.post(Config.API_BASE_URL, state)
                 .then(function (response) {
-                    if (response.status === 201) {
-                        props.handlerFolderForm(response.data, true);
-                        setState({ submitBtnText: "Save", open: false });
-                    } else {
-                        props.handlerFolderForm([]);
-                        setState({ ...state, isSubmiting: false, submitBtnText: "Save" });
+                    if (_isMounted) {
+                        if (response.status === 201) {
+                            props.handlerFolderForm(response.data, true);
+                            setState({submitBtnText: "Save", open: false});
+                        } else {
+                            props.handlerFolderForm([]);
+                            setState({...state, isSubmiting: false, submitBtnText: "Save"});
+                        }
                     }
                 })
                 .catch(function (error) {
                     console.log(error);
-                    setState({ ...state, isSubmiting: false, submitBtnText: "Save" });
-                    props.handlerFolderForm([]);
+                    if (_isMounted) {
+                        setState({...state, isSubmiting: false, submitBtnText: "Save"});
+                        props.handlerFolderForm([]);
+                    }
 
                 });
 
         } else {
-            setState({ ...state, error: true, errorText: "This field is required." });
+            setState({...state, error: true, errorText: "This field is required."});
             textInput.current.focus();
         }
     }
@@ -127,6 +132,7 @@ const FormDialog = (props) => {
         }
     }));
     const defaultClass = useStyles();
+
     function ColorPicker() {
 
         return colors.map(color => {
@@ -150,20 +156,19 @@ const FormDialog = (props) => {
             return (
                 <Tooltip key={color.name} title={color.name} aria-label={color.name} placement="right">
                     <Radio className={classes.nameCls}
-                        checkedIcon={<DoneIcon className={defaultClass.icon} />}
-                        icon=""
-                        name="color"
-                        checked={state['color'] === color.code}
-                        onClick={handleChange}
-                        value={color.code}
-                        inputProps={{
-                            'aria-label': `${color.name} radiobox`,
-                        }}
+                           checkedIcon={<DoneIcon className={defaultClass.icon}/>}
+                           icon=""
+                           name="color"
+                           checked={state['color'] === color.code}
+                           onClick={handleChange}
+                           value={color.code}
+                           inputProps={{
+                               'aria-label': `${color.name} radiobox`,
+                           }}
                     />
                 </Tooltip>)
         })
     }
-
 
 
     return (
@@ -173,7 +178,7 @@ const FormDialog = (props) => {
                 aria-labelledby="customized-dialog-title"
                 TransitionComponent={Transition}
                 keepMounted
-                fullWidth={props.open}
+                fullWidth={true}
                 color="inherit"
                 maxWidth={'sm'}>
                 <DialogTitle id="customized-dialog-title">Add New Folder</DialogTitle>
@@ -186,7 +191,7 @@ const FormDialog = (props) => {
                             helperText={state.errorText}
                             onChange={inputHandle} autoFocus
                             margin="dense" id="name" label="Folder name"
-                            type="text" fullWidth />
+                            type="text" fullWidth/>
                         <DialogContentText className={defaultClass.label}>
                             <FormLabel>Pick color:</FormLabel>
                         </DialogContentText>
@@ -197,9 +202,9 @@ const FormDialog = (props) => {
                     <DialogActions>
                         <Button onClick={handleClose}>
                             Cancel
-                    </Button>
+                        </Button>
                         <Button variant="contained" onClick={handleForm} color="primary">
-                            <CircularProgress size="25" color="secondary" />
+                            <CircularProgress size="25" color="secondary"/>
                             {`${state.submitBtnText}`}
                         </Button>
                     </DialogActions>

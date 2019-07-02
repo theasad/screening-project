@@ -45,7 +45,10 @@ class Details extends React.Component {
             isLoading: true,
             folders: [],
             slug: this.props.router.query.slug,
-            breadCrumItems: []
+            breadCrumItems: {
+                parents: [],
+                active: { name: "Folders" }
+            }
         }
     }
     componentDidMount() {
@@ -54,7 +57,7 @@ class Details extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.router.query.slug !== this.props.router.query.slug) {
-            const slug = nextProps.router.query.slug
+            const slug = nextProps.router.query.slug;
             this.fetchFolderDetails(slug);
         }
     }
@@ -98,7 +101,7 @@ class Details extends React.Component {
         const { folders, isLoading, breadCrumItems } = this.state;
         if (isLoading) {
             return (
-                <Layout>
+                <Layout breadCrumItems={breadCrumItems}>
                     <Head><title>Home-Loading folder</title></Head>
                     <Loader />
                 </Layout>
