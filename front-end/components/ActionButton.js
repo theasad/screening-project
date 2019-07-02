@@ -99,19 +99,16 @@ class SpeedDialTooltipOpen extends React.Component {
                 selectedFiles: files
             });
 
-            for (let file in files) {
-                // console.log(file);
-            }
 
-            // for (let i = 0; i <= this.state.selectedFiles.length; i++) {
-            //     let data = new FormData();
-            //     data.append('file', this.state.selectedFiles[i]);
-            //     data.append('folder', this.state.folder);
-            //     let api_url = `${CONFIG.API_BASE_URL}${this.state.slug}/files/`;
-            //     axios.post(api_url, data).then(response => {
-            //         console.log(response);
-            //     }).then(error => console.log(error))
-            // }
+            for (let i = 0; i < files.length; i++) {
+                let data = new FormData();
+                data.append('file', files[i]);
+                data.append('folder', this.state.folder);
+                let api_url = `${CONFIG.API_BASE_URL}${this.state.slug}/files/`;
+                axios.post(api_url, data).then(response => {
+                    console.log(response);
+                }).then(error => console.log(error))
+            }
 
             // files.map(file=>{
             //     console.log(file)
