@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import SpeedDial from '@material-ui/lab/SpeedDial';
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
-import {CreateNewFolderOutlined as FolderCreateIcon, CloudUploadOutlined as FileUploadIcon} from '@material-ui/icons';
+import { CreateNewFolderOutlined as FolderCreateIcon, CloudUploadOutlined as FileUploadIcon } from '@material-ui/icons';
 import MenuIcon from '@material-ui/icons/Menu';
 import TextField from "@material-ui/core/TextField";
 import axios from 'axios'
@@ -24,8 +24,8 @@ const styles = theme => ({
 });
 
 const actions = [
-    {icon: <FolderCreateIcon/>, name: 'Create New Folder', code: 'folder'},
-    {icon: <FileUploadIcon/>, name: 'Upload New File', code: 'file'}
+    { icon: <FolderCreateIcon />, name: 'Create New Folder', code: 'folder' },
+    { icon: <FileUploadIcon />, name: 'Upload New File', code: 'file' }
 ];
 
 class SpeedDialTooltipOpen extends React.Component {
@@ -36,7 +36,8 @@ class SpeedDialTooltipOpen extends React.Component {
         this.state = {
             isDisableFileUpload: true,
             open: false,
-            selectedFiles: [],
+            uploading: false,
+            files: [],
             folder: this.props.folder.hasOwnProperty('id') ? this.props.folder.id : '',
             slug: this.props.folder.hasOwnProperty('slug') ? this.props.folder.slug : '',
         };
@@ -67,11 +68,6 @@ class SpeedDialTooltipOpen extends React.Component {
         if (code === 'folder') {
             this.props.addFolderModalHandler();
         } else {
-            // let isDisableFileUpload = !this.props.folder.hasOwnProperty('id');
-            this.setState({
-                ...this.state,
-                selectedFiles: []
-            });
             this.upload.click();
         }
         console.log(code);
@@ -91,48 +87,40 @@ class SpeedDialTooltipOpen extends React.Component {
 
     upload_handleChange = (event) => {
         this._isMounted = true;
-        console.log('slug-' + this.state.slug);
-        const files = event.target.files;
+        const files = Array.from(event.target.files);
         if (files.length) {
-            this.setState({
-                ...this.state,
-                selectedFiles: files
+            this.setState({ uploading: true })
+            let api_url = `${CONFIG.API_BASE_URL}${this.state.slug}/files/`;
+            files.forEach((file, i) => {
+                const formData = new FormData()
+                formData.append('folder', this.state.folder);
+                formData.append('file', file);
+                axios.post(api_url, formData).then(response => {
+                    if (this._isMounted) {
+                        if (response.status === 201) {
+                            const file = response.data;
+                            this.state({ files: [file, ...this.state.files], uploading: false })
+                        }
+                    }
+                }).then(error => console.log(error));
             });
-
-
-            for (let i = 0; i < files.length; i++) {
-                let data = new FormData();
-                data.append('file', files[i]);
-                data.append('folder', this.state.folder);
-                let api_url = `${CONFIG.API_BASE_URL}${this.state.slug}/files/`;
-                axios.post(api_url, data).then(response => {
-                    console.log(response);
-                }).then(error => console.log(error))
-            }
-
-            // files.map(file=>{
-            //     console.log(file)
-            //     let data = new FormData();
-            //     data.append('file', file);
-            //     data.append('folder', this.state.folder);
-            //     let api_url = `${CONFIG.API_BASE_URL}${this.state.slug}/files/`;
-            //     axios.post(api_url, data).then(response => {
-            //         console.log(response);
-            //     }).then(error => console.log(error))
-            // });
             this._isMounted = false;
+
+            this.props.handleFileUploadForm(this.state.files, true);
+
         } else {
             this.setState({
-                ...this.state,
-                selectedFiles: []
+                uploading: false,
+                files: []
             });
         }
     };
 
 
     render() {
-        const {classes, folder} = this.props;
-        const {open} = this.state;
+        const { classes, folder } = this.props;
+        const { open } = this.state;
+        console.log(this.state.files);
         console.log("=====================open folder =======================");
         console.log(folder);
         console.log("=====================open folder =======================");
@@ -142,15 +130,15 @@ class SpeedDialTooltipOpen extends React.Component {
                 <TextField
                     inputRef={(ref) => this.upload = ref}
                     error={false}
-                    style={{display: 'none'}}
+                    style={{ display: 'none' }}
                     onChange={this.upload_handleChange} autoFocus
                     id="file-upload" label="Upload File"
-                    inputProps={{'multiple': true}}
-                    type="file" fullWidth/>
+                    inputProps={{ 'multiple': true }}
+                    type="file" fullWidth />
                 <SpeedDial
                     ariaLabel="SpeedDial tooltip example"
                     className={classes.speedDial}
-                    icon={<MenuIcon/>}
+                    icon={<SpeedDialIcon />}
                     onBlur={this.handleClose}
                     onClick={this.handleClick}
                     onClose={this.handleClose}

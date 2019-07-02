@@ -19,7 +19,7 @@ class Layout extends React.Component {
         super(props);
         this.state = {
             isAddModalOpen: false,
-            parent: this.props.hasOwnProperty("breadCrumItems")?this.props.breadCrumItems.active:{},
+            parent: this.props.hasOwnProperty("breadCrumItems") ? this.props.breadCrumItems.active : {},
             isLoading: false,
             snackBarVaritant: 'success',
             isOpenSnackBar: false,
@@ -68,9 +68,9 @@ class Layout extends React.Component {
 
 
 
-    handleFileUploadForm = (data, isSuccess=false)=>{
+    handleFileUploadForm = (data, isSuccess = false) => {
         console.log("File Upload completed");
-      console.log(data);
+        console.log(data);
     };
 
     renderAddForm() {
@@ -90,9 +90,9 @@ class Layout extends React.Component {
             return <Breadcrumbs breadCrumItems={this.props.breadCrumItems} />
     }
 
-    ActionButton(){
-        if (this.props.hasOwnProperty('breadCrumItems')){
-            return  <ActionButton addFolderModalHandler={this.addFolderModalHandler} openfolder={this.state.parent} />
+    ActionButton() {
+        if (this.props.hasOwnProperty('breadCrumItems')) {
+            return <ActionButton addFolderModalHandler={this.addFolderModalHandler} openfolder={this.state.parent} />
         }
     }
 
@@ -107,7 +107,7 @@ class Layout extends React.Component {
                         {this.renderBreadcrumbs()}
                         {this.props.children}
                     </div>
-                    <ActionButton addFolderModalHandler={this.addFolderModalHandler} folder={this.props.breadCrumItems.active} />
+                    <ActionButton handleFileUploadForm={this.handleFileUploadForm} addFolderModalHandler={this.addFolderModalHandler} folder={this.props.breadCrumItems.active} />
                     {/*{this.ActionButton()}*/}
                     {this.renderAddForm()}
                     {this.renderSnackBar()}
