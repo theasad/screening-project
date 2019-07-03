@@ -11,8 +11,6 @@ import { makeStyles, DialogContentText } from "@material-ui/core";
 import Tooltip from "@material-ui/core/Tooltip";
 import FormLabel from '@material-ui/core/FormLabel';
 import DoneIcon from '@material-ui/icons/Done'
-import Config from '../Config.js'
-import axios from 'axios'
 import red from '@material-ui/core/colors/red'
 import pink from '@material-ui/core/colors/pink'
 import purple from '@material-ui/core/colors/purple'
@@ -58,7 +56,6 @@ const colors = [
 ];
 
 const FormDialog = (props) => {
-    let _isMounted = false;
     const [state, setState] = React.useState({
         name: "",
         color: "",
@@ -85,39 +82,16 @@ const FormDialog = (props) => {
     }
 
     function handleForm(event) {
-        if (state.name != "" && !state.error && !state.isSubmiting) {
+        if (state.name !== "" && !state.error && !state.isSubmiting) {
             setState({ ...state, isSubmiting: true, submitBtnText: 'Adding' });
-            // delete state.error;
-            // delete state.errorText;
-            // if (state.parent == "") delete state.parent;
-            _isMounted = true;
 
             const postData = {
-                name:state.name,
-                color:state.color,
-                parent:state.parent
+                name: state.name,
+                color: state.color,
+                parent: state.parent
             }
 
             props.handlerFolderForm(postData);
-            // axios.post(Config.API_BASE_URL, state)
-            //     .then(function (response) {
-            //         if (_isMounted) {
-            //             if (response.status === 201) {
-            //                 props.handlerFolderForm(response.data, true);
-            //                 setState({ submitBtnText: "Save", open: false });
-            //             } else {
-            //                 props.handlerFolderForm([]);
-            //                 setState({ ...state, isSubmiting: false, submitBtnText: "Save" });
-            //             }
-            //         }
-            //     })
-            //     .catch(function (error) {
-            //         if (_isMounted) {
-            //             setState({ ...state, isSubmiting: false, submitBtnText: "Save" });
-            //             props.handlerFolderForm([]);
-            //         }
-            //
-            //     });
 
         } else {
             setState({ ...state, error: true, errorText: "This field is required." });
@@ -130,6 +104,13 @@ const FormDialog = (props) => {
     }
 
     const useStyles = makeStyles(theme => ({
+        radioButton: {
+            opacity: 1,
+            transition: 'opacity 0.3s ease-out',
+            '&:hover': {
+                opacity: 0.85
+            }
+        },
         icon: {
             color: "white",
             fontSize: 30
@@ -138,32 +119,23 @@ const FormDialog = (props) => {
             marginTop: 15
         }
     }));
-    const defaultClass = useStyles();
+    const classes = useStyles();
 
     function ColorPicker() {
 
         return colors.map(color => {
-            let nameCls = color.name
-            const useStylesRadioBox = makeStyles(theme => ({
-
-                nameCls: {
-                    backgroundColor: color.code,
-                    margin: 5,
-                    width: 48,
-                    height: 48,
-                    borderRadius: 0,
-                    '&:hover': {
-                        backgroundColor: `${color.code}!important`,
-                    }
-                },
-
-            }));
-            const classes = useStylesRadioBox();
-
+            const radioButtonStyle = {
+                backgroundColor: color.code,
+                margin: 5,
+                width: 48,
+                height: 48,
+                borderRadius: 0
+            }
             return (
                 <Tooltip key={color.name} title={color.name} aria-label={color.name} placement="right">
-                    <Radio className={classes.nameCls}
-                        checkedIcon={<DoneIcon className={defaultClass.icon} />}
+                    <Radio style={radioButtonStyle}
+                        className={classes.radioButton}
+                        checkedIcon={<DoneIcon className={classes.icon} />}
                         icon=""
                         name="color"
                         checked={state['color'] === color.code}
@@ -189,33 +161,33 @@ const FormDialog = (props) => {
                 color="inherit"
                 maxWidth={'sm'}>
                 <DialogTitle id="customized-dialog-title">Add New Folder</DialogTitle>
-                <form noValidate autoComplete="off">
-                    <DialogContent dividers fullwidth>
-                        <TextField
-                            inputRef={textInput}
-                            error={state.error}
-                            required
-                            helperText={state.errorText}
-                            onChange={inputHandle} autoFocus
-                            margin="dense" id="name" label="Folder name"
-                            type="text" fullWidth />
-                        <DialogContentText className={defaultClass.label}>
-                            <FormLabel>Pick color:</FormLabel>
-                        </DialogContentText>
+                {/* <form noValidate autoComplete="off"> */}
+                <DialogContent dividers fullwidth>
+                    <TextField
+                        inputRef={textInput}
+                        error={state.error}
+                        required
+                        helperText={state.errorText}
+                        onChange={inputHandle} autoFocus
+                        margin="dense" id="name" label="Folder name"
+                        type="text" fullWidth />
+                    <DialogContentText className={classes.label}>
+                        <FormLabel>Pick color:</FormLabel>
+                    </DialogContentText>
 
-                        {ColorPicker()}
+                    {ColorPicker()}
 
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleClose}>
-                            Cancel
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>
+                        Cancel
                         </Button>
-                        <Button variant="contained" onClick={handleForm} color="primary">
-                            <CircularProgress size="25" color="secondary" />
-                            {`${state.submitBtnText}`}
-                        </Button>
-                    </DialogActions>
-                </form>
+                    <Button variant="contained" onClick={handleForm} color="primary">
+                        <CircularProgress size="25" color="secondary" />
+                        {`${state.submitBtnText}`}
+                    </Button>
+                </DialogActions>
+                {/* </form> */}
             </Dialog>
         </div>
     );

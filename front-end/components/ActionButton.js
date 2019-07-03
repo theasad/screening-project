@@ -1,16 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
 import SpeedDial from '@material-ui/lab/SpeedDial';
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
 import { CreateNewFolderOutlined as FolderCreateIcon, CloudUploadOutlined as FileUploadIcon } from '@material-ui/icons';
-import MenuIcon from '@material-ui/icons/Menu';
 import TextField from "@material-ui/core/TextField";
-import axios from 'axios'
-
-import CONFIG from '../Config'
 
 const styles = theme => ({
     root: {
@@ -50,6 +45,13 @@ class SpeedDialTooltipOpen extends React.Component {
                 isDisableFileUpload: false,
                 folder: nextProps.folder.id,
                 slug: nextProps.folder.slug
+            })
+        } else if (!nextProps.folder.hasOwnProperty('id')) {
+            this.setState({
+                ...this.state,
+                isDisableFileUpload: true,
+                folder: '',
+                slug: ''
             })
         }
     }
@@ -105,11 +107,8 @@ class SpeedDialTooltipOpen extends React.Component {
 
 
     render() {
-        const { classes, folder } = this.props;
+        const { classes } = this.props;
         const { open } = this.state;
-        console.log("p-------------------p");
-        console.log(this.props);
-        console.log("p-------------------p");
         return (
             <div className={classes.root}>
                 <TextField
@@ -130,8 +129,7 @@ class SpeedDialTooltipOpen extends React.Component {
                     onFocus={this.handleOpen}
                     onMouseEnter={this.handleOpen}
                     onMouseLeave={this.handleClose}
-                    open={open}
-                >
+                    open={open}>
                     {actions.map(action => (
                         <SpeedDialAction
                             disabled={action.code === 'file' ? this.state.isDisableFileUpload : false}

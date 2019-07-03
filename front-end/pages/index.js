@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Layout from '../components/Layout.js';
 import axios from 'axios';
-import {Container, Grid} from '@material-ui/core';
-import {withStyles} from '@material-ui/core/styles';
+import { Container, Grid } from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Head from 'next/head';
 import Config from '../Config.js'
@@ -11,7 +11,7 @@ import Loader from '../components/Loader'
 import AddFolder from '../components/AddFolder'
 import SnackBar from "../components/SnackBar";
 import ActionButton from "../components/ActionButton";
-import {withRouter} from 'next/router';
+import { withRouter } from 'next/router';
 import CONFIG from "../Config";
 
 const useStyles = (theme => ({
@@ -46,6 +46,7 @@ class Index extends React.Component {
     _isMounted = false;
 
     constructor(props) {
+
         super(props);
 
         this.state = {
@@ -59,15 +60,17 @@ class Index extends React.Component {
             snackBarMessage: '',
             breadCrumItems: {
                 parents: [],
-                active: {name: "Folders"}
+                active: { name: "Folders" }
             }
         };
     }
 
-    fetchParentFolders = async (slug = null) => {
-        console.log(slug);
-        this.setState({isLoading: true});
+    fetchFolders = async (slug = null) => {
+
         this._isMounted = true;
+        if (this._isMounted) {
+            this.setState({ breadCrumItems: this.getBreadCrumItems(), isLoading: true, isOpenSnackBar: false });
+        }
         let API_URL = `${Config.API_BASE_URL}${slug != null ? slug : ''}`;
 
         await axios.get(API_URL)
@@ -82,18 +85,19 @@ class Index extends React.Component {
                             slug: slug
                         });
                     } else {
-                        this.setState({folders: data, isLoading: false, breadCrumItems: this.getBreadCrumItems()});
+                        this.setState({ folders: data, isLoading: false, breadCrumItems: this.getBreadCrumItems() });
                     }
                 }
             }).catch(error => {
-                console.log("err", error.name);
                 throw error;
             })
     }
 
     componentDidMount() {
         const slug = this.props.router.query.slug;
-        this.fetchParentFolders(slug);
+        this.fetchFolders(slug);
+        if (slug)
+            this.getFiles();
     }
 
 
@@ -104,31 +108,32 @@ class Index extends React.Component {
     componentWillReceiveProps(nextProps) {
         if (nextProps.router.query.slug !== this.props.router.query.slug) {
             const slug = nextProps.router.query.slug;
-            this.fetchParentFolders(slug);
+            this.fetchFolders(slug);
+            this.getFiles();
+        } else if (this.state.isOpenSnackBar && !nextProps.router.query.slug) {
+            this.fetchFolders();
+            console.log("000000000000000000000000000")
         }
     }
 
     // Save Folder
 
     saveFolder = async (data) => {
-        this.setState({isLoading: true});
+        this.setState({ isLoading: true });
         this._isMounted = true;
         await axios.post(Config.API_BASE_URL, data)
             .then(response => {
                 if (this._isMounted) {
-                    if (response.status === 201) {
-                        const data = response.data;
-                        this.setState({
-                            ...this.state,
-                            isAddModalOpen: false,
-                            folders: [data, ...this.state.folders],
-                            isOpenSnackBar: true,
-                            snackBarMessage: "Folder successfully created.",
-                            isLoading: false
-                        });
-                    } else {
-                        this.setState({isAddModalOpen: true, isLoading: false});
-                    }
+                    const data = response.data;
+                    this.setState({
+                        ...this.state,
+                        isAddModalOpen: false,
+                        folders: [data, ...this.state.folders],
+                        isOpenSnackBar: true,
+                        snackBarVaritant: 'success',
+                        snackBarMessage: "Folder successfully created.",
+                        isLoading: false
+                    });
                 }
             })
             .catch(function (error) {
@@ -140,16 +145,71 @@ class Index extends React.Component {
         this.saveFolder(data)
     }
 
+
+    // get files
+    getFiles = async () => {
+        this._isMounted = true;
+        if (this._isMounted) {
+            this.setState({ breadCrumItems: this.getBreadCrumItems(), isLoading: true, isOpenSnackBar: false });
+        }
+        let API_URL = `${Config.API_BASE_URL}${this.state.slug}/files`;
+
+        await axios.get(API_URL)
+            .then(response => {
+                const data = response.data;
+                if (this._isMounted) {
+                    this.setState({
+                        files: data,
+                        isLoading: false
+                    });
+                }
+            }).catch(error => {
+                throw error;
+            })
+    }
+
+    // Save file
+
+    handleFileUploadForm = async (formData, filename) => {
+        let api_url = `${CONFIG.API_BASE_URL}${this.state.slug}/files/`;
+        this._isMounted = true;
+        this.setState({ isLoading: true, isOpenSnackBar: false });
+
+        await axios.post(api_url, formData).then(response => {
+            if (this._isMounted) {
+                const file = response.data;
+                this.setState({
+                    files: [file, ...this.state.files],
+                    isLoading: false,
+                    isOpenSnackBar: true,
+                    snackBarVaritant: 'success',
+                    snackBarMessage: `${filename} successfully uploaded.`,
+                });
+            }
+        }).catch(error => {
+            const errors = error.response.data;
+            errors.file.forEach((error, i) => {
+                this.setState({
+                    isLoading: false,
+                    isOpenSnackBar: true,
+                    snackBarVaritant: 'error',
+                    snackBarMessage: `${error} (${filename})`,
+                });
+            });
+            console.log(errors);
+        });
+    }
+
     getBreadCrumItems() {
         return {
             parents: [],
-            active: {name: "Folders"}
+            active: { name: "Folders" }
         }
 
     }
 
     onFolderClick = () => {
-        this.setState({...this.state, isOpenSnackBar: false})
+        this.setState({ ...this.state, isOpenSnackBar: false });
     }
 
 
@@ -163,72 +223,36 @@ class Index extends React.Component {
     renderAddForm() {
         if (this.state.isAddModalOpen) {
             return <AddFolder opnefolder={this.state.breadCrumItems.active} handlerFolderForm={this.handlerFolderForm}
-                              handleClose={this.addFolderModalHandler} open={this.state.isAddModalOpen}/>
+                handleClose={this.addFolderModalHandler} open={this.state.isAddModalOpen} />
         }
     }
 
+    handleSnackBarClose = () => {
+        console.log("Closed Snackbar");
+        // this.setState({ isOpenSnackBar: false });
+    }
 
     renderSnackBar() {
         if (this.state.isOpenSnackBar) {
-            return <SnackBar handleClose={this.handleSnackBarClose} message={this.state.snackBarMessage}
-                             variant={this.state.snackBarVaritant} open={this.state.isOpenSnackBar}/>
+            return <SnackBar handleSnackBarClose={this.handleSnackBarClose} message={this.state.snackBarMessage}
+                variant={this.state.snackBarVaritant} open={this.state.isOpenSnackBar} />
         }
     }
 
 
-    // Save file
-
-    handleFileUploadForm = async (formData, filename) => {
-        let api_url = `${CONFIG.API_BASE_URL}${this.state.slug}/files/`;
-        this._isMounted = true;
-        this.setState({isLoading: true, isOpenSnackBar: false});
-
-        await axios.post(api_url, formData).then(response => {
-            if (this._isMounted) {
-                const file = response.data;
-                this.setState({
-                    files: [file, ...this.state.files],
-                    isLoading: false,
-                    isOpenSnackBar: true,
-                    snackBarMessage: `${filename} successfully uploaded.`,
-                });
-            }
-        }).catch(error => {
-            const errors =  error.response.data;
-            errors.file.forEach((error,i)=>{
-                this.setState({
-                    isLoading: false,
-                    isOpenSnackBar: true,
-                    snackBarVaritant:'error',
-                    snackBarMessage: `${error}`,
-                });
-            });
-            console.log(errors);
-        });
-    }
 
     renderContent() {
-        const {folders, isLoading, breadCrumItems} = this.state;
-        if (isLoading) {
-            return (
-                <Layout breadCrumItems={breadCrumItems}>
-                    <Head><title>Home-mDrive</title></Head>
-                    <Loader/>
-                </Layout>
-            );
-        } else {
-            return <Layout breadCrumItems={breadCrumItems}>
-                <Head><title>Home-mDrive</title></Head>
-                <Folders onFolderClick={this.onFolderClick} folders={folders}/>
+        const { folders, isLoading, breadCrumItems } = this.state;
+        return <Layout breadCrumItems={breadCrumItems} isLoading={isLoading}>
+            <Head><title>Home-mDrive</title></Head>
+            <Folders onFolderClick={this.onFolderClick} folders={folders} />
+            <ActionButton handleFileUploadForm={this.handleFileUploadForm}
+                addFolderModalHandler={this.addFolderModalHandler}
+                folder={this.state.breadCrumItems.active} />
 
-                <ActionButton handleFileUploadForm={this.handleFileUploadForm}
-                              addFolderModalHandler={this.addFolderModalHandler}
-                              folder={this.state.breadCrumItems.active}/>
-
-                {this.renderAddForm()}
-                {this.renderSnackBar()}
-            </Layout>
-        }
+            {this.renderAddForm()}
+            {this.renderSnackBar()}
+        </Layout>
     }
 
 

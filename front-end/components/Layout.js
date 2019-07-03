@@ -22,7 +22,7 @@ class Layout extends React.Component {
             <Fragment>
                 <CssBaseline />
                 <Container maxWidth="lg" >
-                    <Header classes={classes}/>
+                    <Header isLoading={this.props.isLoading} classes={classes} />
                     <div className={classes.innerContainer}>
                         {this.renderBreadcrumbs()}
                         {this.props.children}

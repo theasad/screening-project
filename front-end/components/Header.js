@@ -7,6 +7,7 @@ import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import { Link } from '../routes'
+import Loader from '../components/Loader'
 const useStyles = makeStyles(theme => ({
     root: {
         flexGrow: 1,
@@ -26,6 +27,13 @@ const useStyles = makeStyles(theme => ({
 export default function ButtonAppBar(props) {
     const classes = useStyles();
 
+    const loadigRender = () => {
+        if (props.isLoading) {
+            // if (this.state.isLoading) {
+            return <Loader />
+        }
+        // }
+    }
     return (
         <div className={classes.root}>
             <AppBar position="fixed">
@@ -33,6 +41,7 @@ export default function ButtonAppBar(props) {
                     <Typography variant="h6" className={classes.title}>
                         <Link route="home"><a className={classes.link}>mDrive</a></Link>
                     </Typography>
+                    {loadigRender()}
                     {/*<Button color="inherit" onClick={props.addFolderModalHandler}>Add New Folder</Button>*/}
                     {/*<Button color="inherit">Upload file</Button>*/}
                 </Toolbar>
