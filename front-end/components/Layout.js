@@ -1,99 +1,19 @@
 import React, { Fragment } from 'react'
 import Header from './Header'
 import { Container, CssBaseline, withStyles } from '@material-ui/core';
-import ActionButton from './ActionButton'
 import Breadcrumbs from '../components/Breadcrumbs'
-import AddFolder from '../components/AddFolder'
-import FormFileUpload from '../components/FileUpload'
-import SnackBar from "../components/SnackBar";
 
-const useStyles = (theme => ({
+const useStyles = theme => ({
     innerContainer: {
         marginTop: '5rem'
     }
-}));
+});
 
 class Layout extends React.Component {
-    _upload_field_id = 'file-upload';
-    constructor(props) {
-        super(props);
-        this.state = {
-            isAddModalOpen: false,
-            parent: this.props.hasOwnProperty("breadCrumItems") ? this.props.breadCrumItems.active : {},
-            isLoading: false,
-            snackBarVaritant: 'success',
-            isOpenSnackBar: false,
-            snackBarMessage: ''
-        }
-    }
-    handlerFolderForm = (data) => {
-        this.props.handlerFolderForm(data)
-    }
-
-    addFolderModalHandler = () => {
-        this.setState({
-            isAddModalOpen: !this.state.isAddModalOpen,
-            parent: this.props.breadCrumItems.active
-        })
-    }
-
-    handlerFolderForm = (data, isSuccess = false) => {
-        let snackBarVaritant = this.state.snackBarVaritant;
-        let snackBarMessage = 'Failed to creating folder';
-        if (isSuccess) {
-            snackBarMessage = `Folder successfully created`;
-            this.setState({ isAddModalOpen: false });
-        } else {
-            snackBarVaritant = 'error';
-        }
-
-        this.setState({
-            ...this.state,
-            isOpenSnackBar: true,
-            snackBarVaritant: snackBarVaritant,
-            snackBarMessage
-        })
-        this.props.handlerFolderForm(data);
-    }
-
-    handleSnackBarClose = () => {
-
-        this.setState({
-            ...this.state,
-            isOpenSnackBar: false,
-            snackBarVaritant: 'success',
-            snackBarMessage: ""
-        })
-    };
-
-
-
-    handleFileUploadForm = (data, isSuccess = false) => {
-        console.log("File Upload completed");
-        console.log(data);
-    };
-
-    renderAddForm() {
-        if (this.state.isAddModalOpen) {
-            return <AddFolder opnefolder={this.state.parent} handlerFolderForm={this.handlerFolderForm} handleClose={this.addFolderModalHandler} open={this.state.isAddModalOpen} />
-        }
-    }
-
-    renderSnackBar() {
-        if (this.state.isOpenSnackBar) {
-            return <SnackBar handleClose={this.handleSnackBarClose} message={this.state.snackBarMessage} variant={this.state.snackBarVaritant} open={this.state.isOpenSnackBar} />
-        }
-    }
 
     renderBreadcrumbs() {
         if (this.props.hasOwnProperty('breadCrumItems'))
             return <Breadcrumbs breadCrumItems={this.props.breadCrumItems} />
-    }
-
-    ActionButton() {
-        if (this.props.hasOwnProperty('breadCrumItems')) {
-            return <ActionButton addFolderModalHandler={this.addFolderModalHandler} openfolder={this.state.parent} />
-        }
     }
 
     render() {
@@ -102,15 +22,11 @@ class Layout extends React.Component {
             <Fragment>
                 <CssBaseline />
                 <Container maxWidth="lg" >
-                    <Header classes={classes} addFolderModalHandler={this.addFolderModalHandler} />
+                    <Header classes={classes}/>
                     <div className={classes.innerContainer}>
                         {this.renderBreadcrumbs()}
                         {this.props.children}
                     </div>
-                    <ActionButton handleFileUploadForm={this.handleFileUploadForm} addFolderModalHandler={this.addFolderModalHandler} folder={this.props.breadCrumItems.active} />
-                    {/*{this.ActionButton()}*/}
-                    {this.renderAddForm()}
-                    {this.renderSnackBar()}
                 </Container>
             </Fragment>
         )

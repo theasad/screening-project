@@ -87,29 +87,37 @@ const FormDialog = (props) => {
     function handleForm(event) {
         if (state.name != "" && !state.error && !state.isSubmiting) {
             setState({ ...state, isSubmiting: true, submitBtnText: 'Adding' });
-            delete state.error;
-            delete state.errorText;
-            if (state.parent == "") delete state.parent;
+            // delete state.error;
+            // delete state.errorText;
+            // if (state.parent == "") delete state.parent;
             _isMounted = true;
-            axios.post(Config.API_BASE_URL, state)
-                .then(function (response) {
-                    if (_isMounted) {
-                        if (response.status === 201) {
-                            props.handlerFolderForm(response.data, true);
-                            setState({ submitBtnText: "Save", open: false });
-                        } else {
-                            props.handlerFolderForm([]);
-                            setState({ ...state, isSubmiting: false, submitBtnText: "Save" });
-                        }
-                    }
-                })
-                .catch(function (error) {
-                    if (_isMounted) {
-                        setState({ ...state, isSubmiting: false, submitBtnText: "Save" });
-                        props.handlerFolderForm([]);
-                    }
 
-                });
+            const postData = {
+                name:state.name,
+                color:state.color,
+                parent:state.parent
+            }
+
+            props.handlerFolderForm(postData);
+            // axios.post(Config.API_BASE_URL, state)
+            //     .then(function (response) {
+            //         if (_isMounted) {
+            //             if (response.status === 201) {
+            //                 props.handlerFolderForm(response.data, true);
+            //                 setState({ submitBtnText: "Save", open: false });
+            //             } else {
+            //                 props.handlerFolderForm([]);
+            //                 setState({ ...state, isSubmiting: false, submitBtnText: "Save" });
+            //             }
+            //         }
+            //     })
+            //     .catch(function (error) {
+            //         if (_isMounted) {
+            //             setState({ ...state, isSubmiting: false, submitBtnText: "Save" });
+            //             props.handlerFolderForm([]);
+            //         }
+            //
+            //     });
 
         } else {
             setState({ ...state, error: true, errorText: "This field is required." });

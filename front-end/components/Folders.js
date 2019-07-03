@@ -40,7 +40,7 @@ function Folders(props) {
                 folders.map(folder => {
                     return <Grid item key={folder.slug} className={classes.gridItem}>
                         <Paper className={classes.paper}>
-                            <Folder classes={classes} folder={folder} />
+                            <Folder classes={classes} folder={folder} onFolderClick={props.onFolderClick} />
                         </Paper>
                     </Grid>
                 })

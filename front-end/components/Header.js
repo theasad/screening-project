@@ -33,8 +33,8 @@ export default function ButtonAppBar(props) {
                     <Typography variant="h6" className={classes.title}>
                         <Link route="home"><a className={classes.link}>mDrive</a></Link>
                     </Typography>
-                    <Button color="inherit" onClick={props.addFolderModalHandler}>Add New Folder</Button>
-                    <Button color="inherit">Upload file</Button>
+                    {/*<Button color="inherit" onClick={props.addFolderModalHandler}>Add New Folder</Button>*/}
+                    {/*<Button color="inherit">Upload file</Button>*/}
                 </Toolbar>
             </AppBar>
         </div>

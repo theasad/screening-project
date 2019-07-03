@@ -34,7 +34,7 @@ class SpeedDialTooltipOpen extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isDisableFileUpload: true,
+            isDisableFileUpload: !this.props.folder.hasOwnProperty('id'),
             open: false,
             uploading: false,
             files: [],
@@ -86,25 +86,14 @@ class SpeedDialTooltipOpen extends React.Component {
         this._isMounted = true;
         const files = Array.from(event.target.files);
         if (files.length) {
-            this.setState({ uploading: true })
-            let api_url = `${CONFIG.API_BASE_URL}${this.state.slug}/files/`;
+            this.setState({ uploading: true });
             files.forEach((file, i) => {
-                const formData = new FormData()
+                const formData = new FormData();
                 formData.append('folder', this.state.folder);
                 formData.append('file', file);
-                axios.post(api_url, formData).then(response => {
-                    // if (this._isMounted) {
-                    if (response.status === 201) {
-                        const file = response.data;
-                        this.setState({ files: [file, ...this.state.files], uploading: false });
-                        this.props.handleFileUploadForm(file, true)
-                    }
-                    // }
-                }).then(error => console.log(error));
+                this.props.handleFileUploadForm(formData, file.name)
             });
-            // this._isMounted = false;
-
-            // ;
+            this._isMounted = false;
 
         } else {
             this.setState({
@@ -118,6 +107,9 @@ class SpeedDialTooltipOpen extends React.Component {
     render() {
         const { classes, folder } = this.props;
         const { open } = this.state;
+        console.log("p-------------------p");
+        console.log(this.props);
+        console.log("p-------------------p");
         return (
             <div className={classes.root}>
                 <TextField

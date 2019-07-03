@@ -26,7 +26,7 @@ export default function Folder(props) {
     }));
     const classes = useStyles();
     return <Link route='folder' params={{ slug: props.folder.slug }}>
-        <a className={classes.folder}>
+        <a className={classes.folder} onClick={props.onFolderClick}>
             <FolderIcon className={classes.driveFolderIcon} /> <span>{props.folder.name}</span>
         </a>
     </Link>
