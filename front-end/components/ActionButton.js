@@ -41,9 +41,6 @@ class SpeedDialTooltipOpen extends React.Component {
             folder: this.props.folder.hasOwnProperty('id') ? this.props.folder.id : '',
             slug: this.props.folder.hasOwnProperty('slug') ? this.props.folder.slug : '',
         };
-        console.log("---------------------")
-        console.log(this.props.folder)
-        console.log("---------------------")
     }
 
     componentWillReceiveProps(nextProps, nextContext) {
@@ -96,17 +93,18 @@ class SpeedDialTooltipOpen extends React.Component {
                 formData.append('folder', this.state.folder);
                 formData.append('file', file);
                 axios.post(api_url, formData).then(response => {
-                    if (this._isMounted) {
-                        if (response.status === 201) {
-                            const file = response.data;
-                            this.state({ files: [file, ...this.state.files], uploading: false })
-                        }
+                    // if (this._isMounted) {
+                    if (response.status === 201) {
+                        const file = response.data;
+                        this.setState({ files: [file, ...this.state.files], uploading: false });
+                        this.props.handleFileUploadForm(file, true)
                     }
+                    // }
                 }).then(error => console.log(error));
             });
-            this._isMounted = false;
+            // this._isMounted = false;
 
-            this.props.handleFileUploadForm(this.state.files, true);
+            // ;
 
         } else {
             this.setState({
@@ -120,13 +118,8 @@ class SpeedDialTooltipOpen extends React.Component {
     render() {
         const { classes, folder } = this.props;
         const { open } = this.state;
-        console.log(this.state.files);
-        console.log("=====================open folder =======================");
-        console.log(folder);
-        console.log("=====================open folder =======================");
         return (
             <div className={classes.root}>
-                {this.state.files}
                 <TextField
                     inputRef={(ref) => this.upload = ref}
                     error={false}
