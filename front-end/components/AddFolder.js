@@ -157,7 +157,7 @@ const FormDialog = (props) => {
                 aria-labelledby="customized-dialog-title"
                 TransitionComponent={Transition}
                 keepMounted
-                fullWidth={true}
+                
                 color="inherit"
                 maxWidth={'sm'}>
                 <DialogTitle id="customized-dialog-title">Add New Folder</DialogTitle>

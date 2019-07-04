@@ -1,33 +1,19 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { SnackbarProvider, useSnackbar } from 'notistack';
-import Button from '@material-ui/core/Button'
-import CloseIcon from '@material-ui/icons/CloseOutlined'
+
 function MyApp(props) {
     const { message, variant } = props;
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const { enqueueSnackbar } = useSnackbar();
 
     function hide(key) {
-        // console.log(key);
-        // closeSnackbar(key);
-        // props.handleSnackBarClose();
+        console.log("Trigger for closing snackbar.");
     }
 
 
     enqueueSnackbar(message, {
-        // persist: true,
         variant: variant,
         onClose: hide,
-        // autoHideDuration: 2500,
-        // action: key => (
-        //     <Button color="secondary" size="small" onClick={() => hide(key)}>
-        //         <CloseIcon style={{ color: '#fff' }} />
-        //     </Button>
-        // ),
-        // children: key => {
-        //     console.log(key)
-        // }
     })
-    // closeSnackbar(key);
     return (<h1 style={{ display: 'none' }}>Snackbar Loading...</h1>)
 
 }

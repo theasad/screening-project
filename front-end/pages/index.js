@@ -1,18 +1,16 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import Layout from '../components/Layout.js';
 import axios from 'axios';
-import { Container, Grid } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Head from 'next/head';
 import Config from '../Config.js'
 import Folders from '../components/Folders'
-import Loader from '../components/Loader'
 import AddFolder from '../components/AddFolder'
 import SnackBar from "../components/SnackBar";
 import ActionButton from "../components/ActionButton";
 import { withRouter } from 'next/router';
 import CONFIG from "../Config";
+import Error from '../pages/_error'
 
 const useStyles = (theme => ({
     root: {
@@ -58,6 +56,8 @@ class Index extends React.Component {
             isOpenSnackBar: false,
             snackBarVaritant: 'success',
             snackBarMessage: '',
+            hasError: false,
+            errorStatusCode: '',
             breadCrumItems: {
                 parents: [],
                 active: { name: "Folders" }
@@ -69,7 +69,7 @@ class Index extends React.Component {
 
         this._isMounted = true;
         if (this._isMounted) {
-            this.setState({ breadCrumItems: this.getBreadCrumItems(), isLoading: true, isOpenSnackBar: false });
+            this.setState({ hasError: false, breadCrumItems: this.getBreadCrumItems(), isLoading: true, isOpenSnackBar: false });
         }
         let API_URL = `${Config.API_BASE_URL}${slug != null ? slug : ''}`;
 
@@ -89,15 +89,22 @@ class Index extends React.Component {
                     }
                 }
             }).catch(error => {
-                throw error;
+                let errorStatus = "";
+                if (typeof error.response != "undefined") {
+                    errorStatus = error.response.status;
+                }
+                this.setState({ hasError: true, errorStatusCode: errorStatus, isLoading: false, breadCrumItems: this.state.breadCrumItems });
+
+                throw error
             })
     }
 
     componentDidMount() {
         const slug = this.props.router.query.slug;
         this.fetchFolders(slug);
-        if (slug)
-            this.getFiles();
+
+        if (typeof slug != "undefined")
+            this.getFiles(slug);
     }
 
 
@@ -109,10 +116,10 @@ class Index extends React.Component {
         if (nextProps.router.query.slug !== this.props.router.query.slug) {
             const slug = nextProps.router.query.slug;
             this.fetchFolders(slug);
-            this.getFiles();
+            if (typeof slug != "undefined")
+                this.getFiles(slug);
         } else if (this.state.isOpenSnackBar && !nextProps.router.query.slug) {
             this.fetchFolders();
-            console.log("000000000000000000000000000")
         }
     }
 
@@ -136,8 +143,8 @@ class Index extends React.Component {
                     });
                 }
             })
-            .catch(function (error) {
-                console.log(error);
+            .catch(error => {
+                throw error;
             });
     }
 
@@ -147,12 +154,12 @@ class Index extends React.Component {
 
 
     // get files
-    getFiles = async () => {
+    getFiles = async (slug) => {
         this._isMounted = true;
         if (this._isMounted) {
             this.setState({ breadCrumItems: this.getBreadCrumItems(), isLoading: true, isOpenSnackBar: false });
         }
-        let API_URL = `${Config.API_BASE_URL}${this.state.slug}/files`;
+        let API_URL = `${Config.API_BASE_URL}${slug}/files`;
 
         await axios.get(API_URL)
             .then(response => {
@@ -196,7 +203,7 @@ class Index extends React.Component {
                     snackBarMessage: `${error} (${filename})`,
                 });
             });
-            console.log(errors);
+            throw error;
         });
     }
 
@@ -229,7 +236,6 @@ class Index extends React.Component {
 
     handleSnackBarClose = () => {
         console.log("Closed Snackbar");
-        // this.setState({ isOpenSnackBar: false });
     }
 
     renderSnackBar() {
@@ -243,18 +249,29 @@ class Index extends React.Component {
 
     renderContent() {
         const { folders, isLoading, breadCrumItems } = this.state;
+
+        if (this.state.hasError) {
+            return <Layout breadCrumItems={breadCrumItems} isLoading={isLoading}>
+                <Head><title>Home-mDrive</title></Head>
+                {this.renderError()}
+            </Layout>
+        }
+
         return <Layout breadCrumItems={breadCrumItems} isLoading={isLoading}>
             <Head><title>Home-mDrive</title></Head>
             <Folders onFolderClick={this.onFolderClick} folders={folders} />
+            {this.renderAddForm()}
+            {this.renderSnackBar()}
             <ActionButton handleFileUploadForm={this.handleFileUploadForm}
                 addFolderModalHandler={this.addFolderModalHandler}
                 folder={this.state.breadCrumItems.active} />
-
-            {this.renderAddForm()}
-            {this.renderSnackBar()}
         </Layout>
     }
 
+    renderError = () => {
+        if (this.state.hasError)
+            return <Error statusCode={this.state.errorStatusCode} />
+    }
 
     render() {
         return (

@@ -50,7 +50,6 @@ function activeBreadCrumItem(breadCrumItems) {
 export default function CustomSeparator(props) {
     const classes = useStyles();
     const { breadCrumItems } = props
-    console.log(breadCrumItems);
 
     return (
         <div className={classes.root}>

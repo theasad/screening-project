@@ -29,10 +29,8 @@ export default function ButtonAppBar(props) {
 
     const loadigRender = () => {
         if (props.isLoading) {
-            // if (this.state.isLoading) {
             return <Loader />
         }
-        // }
     }
     return (
         <div className={classes.root}>
@@ -42,8 +40,6 @@ export default function ButtonAppBar(props) {
                         <Link route="home"><a className={classes.link}>mDrive</a></Link>
                     </Typography>
                     {loadigRender()}
-                    {/*<Button color="inherit" onClick={props.addFolderModalHandler}>Add New Folder</Button>*/}
-                    {/*<Button color="inherit">Upload file</Button>*/}
                 </Toolbar>
             </AppBar>
         </div>

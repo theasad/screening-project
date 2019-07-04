@@ -69,7 +69,6 @@ class SpeedDialTooltipOpen extends React.Component {
         } else {
             this.upload.click();
         }
-        console.log(code);
     };
 
     handleOpen = () => {
