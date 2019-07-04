@@ -10,6 +10,7 @@ import SnackBar from "../components/SnackBar";
 import ActionButton from "../components/ActionButton";
 import { withRouter } from 'next/router';
 import CONFIG from "../Config";
+import Files from '../components/Files'
 import Error from '../pages/_error'
 
 const useStyles = (theme => ({
@@ -65,6 +66,30 @@ class Index extends React.Component {
         };
     }
 
+    componentDidMount() {
+        const slug = this.props.router.query.slug;
+        this.fetchFolders(slug);
+
+        if (typeof slug != "undefined")
+            this.getFiles(slug);
+    }
+
+
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.router.query.slug !== this.props.router.query.slug) {
+            const slug = nextProps.router.query.slug;
+            this.fetchFolders(slug);
+            if (typeof slug != "undefined")
+                this.getFiles(slug);
+        } else if (this.state.isOpenSnackBar && !nextProps.router.query.slug) {
+            this.fetchFolders();
+        }
+    }
+
     fetchFolders = async (slug = null) => {
 
         this._isMounted = true;
@@ -99,32 +124,7 @@ class Index extends React.Component {
             })
     }
 
-    componentDidMount() {
-        const slug = this.props.router.query.slug;
-        this.fetchFolders(slug);
-
-        if (typeof slug != "undefined")
-            this.getFiles(slug);
-    }
-
-
-    componentWillUnmount() {
-        this._isMounted = false;
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.router.query.slug !== this.props.router.query.slug) {
-            const slug = nextProps.router.query.slug;
-            this.fetchFolders(slug);
-            if (typeof slug != "undefined")
-                this.getFiles(slug);
-        } else if (this.state.isOpenSnackBar && !nextProps.router.query.slug) {
-            this.fetchFolders();
-        }
-    }
-
     // Save Folder
-
     saveFolder = async (data) => {
         this.setState({ isLoading: true });
         this._isMounted = true;
@@ -245,7 +245,10 @@ class Index extends React.Component {
         }
     }
 
-
+    renderFiles() {
+        if (this.state.files.length)
+            return <Files files={this.state.files} />
+    }
 
     renderContent() {
         const { folders, isLoading, breadCrumItems } = this.state;
@@ -260,6 +263,7 @@ class Index extends React.Component {
         return <Layout breadCrumItems={breadCrumItems} isLoading={isLoading}>
             <Head><title>Home-mDrive</title></Head>
             <Folders onFolderClick={this.onFolderClick} folders={folders} />
+            {this.renderFiles()}
             {this.renderAddForm()}
             {this.renderSnackBar()}
             <ActionButton handleFileUploadForm={this.handleFileUploadForm}
