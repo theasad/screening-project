@@ -80,7 +80,7 @@
 
 
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableSortLabel from '@material-ui/core/TableSortLabel'
 import TableBody from '@material-ui/core/TableBody';
@@ -89,8 +89,10 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Moment from 'react-moment';
-import { Avatar, Toolbar, Tooltip, IconButton } from '@material-ui/core';
+import { Avatar, Toolbar, Tooltip, IconButton, Link, ListItemText } from '@material-ui/core';
 import FilterListIcon from '@material-ui/icons/FilterList';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import { Router } from '../routes'
 
 const useStyles = makeStyles(theme => ({
@@ -121,18 +123,65 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'flex-end'
+    },
+    tableCell: {
+        padding: "0 5px"
     }
 }));
 
+const StyledMenu = withStyles({
+    paper: {
+        border: '1px solid #d3d4d5',
+    },
+})(props => (
+    <Menu
+        elevation={0}
+        getContentAnchorEl={null}
+        anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+        }}
+        transformOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+        }}
+        {...props}
+    />
+));
 
+
+const StyledMenuItem = withStyles(theme => ({
+    root: {
+        '&:focus': {
+            backgroundColor: theme.palette.primary.main,
+            '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
+                color: theme.palette.common.white,
+            },
+        },
+    },
+}))(MenuItem);
 
 export default function Files(props) {
+    const [anchorEl, setAnchorEl] = React.useState(null);
+
+    function handleClick(event) {
+        setAnchorEl(event.currentTarget);
+    }
+
+    function handleClose() {
+        setAnchorEl(null);
+    }
     const classes = useStyles();
     const { orderBy, direction } = props;
-    const createSortHandler = property => event => {
-        const updateDirection = direction === 'desc' ? 'asc' : 'desc'
+    const createSortHandler = (property, order) => event => {
+
+        let updateDirection = direction === 'desc' ? 'asc' : 'desc'
+        updateDirection = typeof order === "undefined" ? updateDirection : order;
         const updateRouteQuery = { slug: props.folder.slug, orderBy: property, direction: updateDirection }
         Router.pushRoute('folder', updateRouteQuery)
+        if (typeof order !== "undefined") {
+            setAnchorEl(null);
+        }
     };
 
 
@@ -141,11 +190,35 @@ export default function Files(props) {
         <Paper className={classes.root}>
             <Toolbar className={classes.tableToolBar}>
                 <Tooltip title="Filter list">
-                    <IconButton aria-label="Filter list">
+                    <IconButton onClick={handleClick} aria-label="Filter list">
                         <FilterListIcon />
                     </IconButton>
                 </Tooltip>
             </Toolbar>
+
+            <div>
+                <StyledMenu
+                    id="customized-menu"
+                    anchorEl={anchorEl}
+                    keepMounted
+                    open={Boolean(anchorEl)}
+                    onClose={handleClose}
+                >
+                    <StyledMenuItem onClick={createSortHandler('name', 'asc')}>
+                        <ListItemText primary="Sorting by name asc" />
+                    </StyledMenuItem>
+                    <StyledMenuItem onClick={createSortHandler('name', 'desc')}>
+                        <ListItemText primary="Sorting by name desc" />
+                    </StyledMenuItem>
+                    <StyledMenuItem onClick={createSortHandler('created', 'asc')}>
+                        <ListItemText primary="Sorting by uploaded date asc" />
+                    </StyledMenuItem>
+                    <StyledMenuItem onClick={createSortHandler('created', 'desc')}>
+                        <ListItemText primary="Sorting by uploaded date desc" />
+                    </StyledMenuItem>
+                </StyledMenu>
+            </div>
+
             <Table className={classes.table} size="small">
                 <TableHead>
                     <TableRow>
@@ -171,16 +244,18 @@ export default function Files(props) {
                 <TableBody>
                     {props.files.map((file, i) => (
                         <TableRow key={i} hover>
-                            <TableCell component="th" scope="row">
+                            <TableCell className={classes.tableCell} component="th" scope="row">
                                 <div className={classes.fileRoot}>
                                     <Avatar className={classes.avartar}>
                                         <img alt={file.name} src={file.icon} className={classes.image} />
                                     </Avatar>
-                                    {file.name}
+                                    <Link target="_blank" href={file.file} color="textPrimary">
+                                        {file.name}
+                                    </Link>
                                 </div>
                             </TableCell>
-                            <TableCell align="center">{file.size}</TableCell>
-                            <TableCell align="center">
+                            <TableCell className={classes.tableCell} align="center">{file.size}</TableCell>
+                            <TableCell className={classes.tableCell} align="center">
                                 <Moment format="MMM DD, YYYY h:mm A">
                                     {file.created}
                                 </Moment>
