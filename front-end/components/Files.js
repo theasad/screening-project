@@ -89,7 +89,9 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Moment from 'react-moment';
-import { Avatar } from '@material-ui/core';
+import { Avatar, Toolbar, Tooltip, IconButton } from '@material-ui/core';
+import FilterListIcon from '@material-ui/icons/FilterList';
+import { Router } from '../routes'
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -114,40 +116,61 @@ const useStyles = makeStyles(theme => ({
     image: {
         maxWidth: '100%',
         height: 'auto'
+    },
+    tableToolBar: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end'
     }
 }));
 
 
 
-export default function SimpleTable(props) {
+export default function Files(props) {
     const classes = useStyles();
-
+    const { orderBy, direction } = props;
     const createSortHandler = property => event => {
-        console.log("desc");
+        const updateDirection = direction === 'desc' ? 'asc' : 'desc'
+        const updateRouteQuery = { slug: props.folder.slug, orderBy: property, direction: updateDirection }
+        Router.pushRoute('folder', updateRouteQuery)
     };
+
 
 
     return (
         <Paper className={classes.root}>
+            <Toolbar className={classes.tableToolBar}>
+                <Tooltip title="Filter list">
+                    <IconButton aria-label="Filter list">
+                        <FilterListIcon />
+                    </IconButton>
+                </Tooltip>
+            </Toolbar>
             <Table className={classes.table} size="small">
                 <TableHead>
                     <TableRow>
-                        <TableCell>
+                        <TableCell sortDirection={orderBy === 'name' ? direction : false}>
                             <TableSortLabel
-                                active=""
-                                direction=""
-                                onClick={createSortHandler}
-                            >
+                                active={orderBy === 'name'}
+                                direction={direction}
+                                onClick={createSortHandler('name')}>
                                 File Name
-            </TableSortLabel>
+                            </TableSortLabel>
                         </TableCell>
                         <TableCell align="center">File Size</TableCell>
-                        <TableCell align="center">Upload Date</TableCell>
+                        <TableCell align="center" sortDirection={orderBy === 'created' ? direction : false}>
+                            <TableSortLabel
+                                active={orderBy === 'created'}
+                                direction={direction}
+                                onClick={createSortHandler('created')}>
+                                Uploaded At
+                            </TableSortLabel>
+                        </TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {props.files.map((file, i) => (
-                        <TableRow key={i}>
+                        <TableRow key={i} hover>
                             <TableCell component="th" scope="row">
                                 <div className={classes.fileRoot}>
                                     <Avatar className={classes.avartar}>
@@ -158,7 +181,7 @@ export default function SimpleTable(props) {
                             </TableCell>
                             <TableCell align="center">{file.size}</TableCell>
                             <TableCell align="center">
-                                <Moment format="dddd MMMM, YYYY h:mm A">
+                                <Moment format="MMM DD, YYYY h:mm A">
                                     {file.created}
                                 </Moment>
                             </TableCell>

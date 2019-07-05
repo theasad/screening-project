@@ -13,6 +13,7 @@ import CONFIG from "../Config";
 import Files from '../components/Files'
 import Error from '../pages/_error'
 
+
 const useStyles = (theme => ({
     root: {
         display: 'flex',
@@ -51,6 +52,8 @@ class Index extends React.Component {
         this.state = {
             folders: [],
             files: [],
+            orderBy: 'created',
+            direction: 'desc',
             slug: null,
             isLoading: false,
             isAddModalOpen: false,
@@ -70,8 +73,10 @@ class Index extends React.Component {
         const slug = this.props.router.query.slug;
         this.fetchFolders(slug);
 
-        if (typeof slug != "undefined")
-            this.getFiles(slug);
+        if (typeof slug != "undefined") {
+            const query = this.props.router.query;
+            this.getFiles(slug, query);
+        }
     }
 
 
@@ -79,14 +84,23 @@ class Index extends React.Component {
         this._isMounted = false;
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.router.query.slug !== this.props.router.query.slug) {
-            const slug = nextProps.router.query.slug;
-            this.fetchFolders(slug);
-            if (typeof slug != "undefined")
-                this.getFiles(slug);
-        } else if (this.state.isOpenSnackBar && !nextProps.router.query.slug) {
+    componentWillUpdate(prevProps) {
+        let slug = prevProps.router.query.slug;
+        const query = prevProps.router.query;
+
+        if ((prevProps.router.query.slug !== this.props.router.query.slug)) {
+            this.fetchFolders(typeof slug != "undefined" ? slug : null);
+            if (typeof slug != "undefined") {
+                this.getFiles(slug, query);
+            } else {
+                this.setState({ files: [] })
+            }
+
+        } else if (typeof slug != "undefined" && (prevProps.router.query.orderBy !== this.props.router.query.orderBy || prevProps.router.query.direction !== this.props.router.query.direction)) {
+            this.getFiles(slug, query);
+        } else if (this.state.isOpenSnackBar && typeof slug == "undefined") {
             this.fetchFolders();
+            this.setState({ files: [] })
         }
     }
 
@@ -94,7 +108,7 @@ class Index extends React.Component {
 
         this._isMounted = true;
         if (this._isMounted) {
-            this.setState({ hasError: false, breadCrumItems: this.getBreadCrumItems(), isLoading: true, isOpenSnackBar: false });
+            this.setState({ hasError: false, breadCrumItems: this.state.breadCrumItems, isLoading: true, isOpenSnackBar: false });
         }
         let API_URL = `${Config.API_BASE_URL}${slug != null ? slug : ''}`;
 
@@ -110,7 +124,7 @@ class Index extends React.Component {
                             slug: slug
                         });
                     } else {
-                        this.setState({ folders: data, isLoading: false, breadCrumItems: this.getBreadCrumItems() });
+                        this.setState({ folders: data, files: [], isLoading: false, breadCrumItems: this.getBreadCrumItems() });
                     }
                 }
             }).catch(error => {
@@ -154,25 +168,35 @@ class Index extends React.Component {
 
 
     // get files
-    getFiles = async (slug) => {
+    getFiles = async (slug, query) => {
         this._isMounted = true;
         if (this._isMounted) {
-            this.setState({ breadCrumItems: this.getBreadCrumItems(), isLoading: true, isOpenSnackBar: false });
+            this.setState({ breadCrumItems: this.state.breadCrumItems, isLoading: true, isOpenSnackBar: false });
         }
-        let API_URL = `${Config.API_BASE_URL}${slug}/files`;
 
-        await axios.get(API_URL)
+        const params = {
+            orderby: query.direction === 'desc' ? `-${query.orderBy}` : query.orderBy
+        }
+
+        let API_URL = `${Config.API_BASE_URL}${slug}/files?`;
+
+        await axios.get(API_URL, {
+            params: params
+        })
             .then(response => {
                 const data = response.data;
                 if (this._isMounted) {
                     this.setState({
                         files: data,
-                        isLoading: false
+                        isLoading: false,
+                        orderBy: typeof query.orderBy !== "undefined" ? query.orderBy : 'created',
+                        direction: typeof query.direction !== "undefined" ? query.direction : 'desc',
                     });
                 }
             }).catch(error => {
                 throw error;
             })
+
     }
 
     // Save file
@@ -247,7 +271,7 @@ class Index extends React.Component {
 
     renderFiles() {
         if (this.state.files.length)
-            return <Files files={this.state.files} />
+            return <Files folder={this.state.breadCrumItems.active} orderBy={this.state.orderBy} direction={this.state.direction} files={this.state.files} />
     }
 
     renderContent() {
