@@ -47,9 +47,9 @@ def file_directory_path(instance, filename):
         parent_folder = list(folders.values_list('slug', flat=True))
         folder_list = parent_folder+[instance.folder.slug]
         destination_folder = "/".join(folder_list)
-        return f'drive/{destination_folder}/{filename}'
+        return 'drive/{}/{}'.format(destination_folder, filename)
     else:
-        return f'drive/files/{filename}'
+        return 'drive/files/{}'.format(filename)
 
 
 class File(models.Model):
