@@ -174,10 +174,10 @@ class Index extends React.Component {
             orderby: query.direction === 'desc' ? `-${query.orderBy}` : query.orderBy
         }
 
-        let API_URL = `${Config.API_BASE_URL}${slug ? `${slug}/` : ''}files?`;
+        let API_URL = `${Config.API_BASE_URL}${slug ? `${slug}/` : ''}files`;
 
         await axios.get(API_URL, {
-            params: params
+            params:params
         })
             .then(response => {
                 const data = response.data;

@@ -94,7 +94,6 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { Router } from '../routes'
-import { type } from 'os';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -211,16 +210,16 @@ export default function Files(props) {
                     onClose={handleClose}
                 >
                     <StyledMenuItem onClick={createSortHandler('name', 'asc')}>
-                        <ListItemText primary="Sorting by name asc" />
+                        <ListItemText primary="Sorting by name asc order" />
                     </StyledMenuItem>
                     <StyledMenuItem onClick={createSortHandler('name', 'desc')}>
-                        <ListItemText primary="Sorting by name desc" />
+                        <ListItemText primary="Sorting by name desc order" />
                     </StyledMenuItem>
                     <StyledMenuItem onClick={createSortHandler('created', 'asc')}>
-                        <ListItemText primary="Sorting by uploaded date asc" />
+                        <ListItemText primary="Sorting by uploaded date asc order" />
                     </StyledMenuItem>
                     <StyledMenuItem onClick={createSortHandler('created', 'desc')}>
-                        <ListItemText primary="Sorting by uploaded date desc" />
+                        <ListItemText primary="Sorting by uploaded date desc order" />
                     </StyledMenuItem>
                 </StyledMenu>
             </div>
