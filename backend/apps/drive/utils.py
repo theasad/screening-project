@@ -78,7 +78,7 @@ def _slug_strip(value, separator='-'):
 def get_media_filesize(file):
     unit = 'bytes'
     size = 0
-    file_dir = f"{settings.MEDIA_ROOT}/{file}"
+    file_dir = "{}/{}".format(settings.MEDIA_ROOT, file)
     if os.path.exists(file_dir):
         size = os.path.getsize(file_dir)
         size, unit = (size/1024, 'KB') if size >= 1024 else (size, unit)
@@ -87,9 +87,9 @@ def get_media_filesize(file):
 
         size, unit = (size/1024, 'GB') if size >= 1024 else (size, unit)
         size = round(size, 2)
-        size_str = f"{size} {unit}"
+        size_str = "{} {}".format(size, unit)
     else:
-        size_str = f"{size} {unit}"
+        size_str = "{} {}".format(size, unit)
 
     return size_str
 
@@ -106,12 +106,12 @@ def get_file_icon(request, filename):
         elif icon_name in ['ppt', 'pptx']:
             icon_name = 'powerpoint'
 
-        icon_dir = f"{settings.STATIC_ROOT}/icons/{icon_name}.png"
+        icon_dir = "{}/icons/{}.png".format(settings.STATIC_ROOT, icon_name)
 
         # Check icon exist or not
         is_file_exists = os.path.exists(icon_dir)
         if not is_file_exists:
             icon_name = 'file'
 
-    icon_url = f"{settings.FILE_ICON_URL}{icon_name}.png"
+    icon_url = "{}{}.png".format(settings.FILE_ICON_URL, icon_name)
     return request.build_absolute_uri(icon_url)
