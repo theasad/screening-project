@@ -8,5 +8,7 @@ from apps.drive import views
 
 urlpatterns = [
     path('folders/', views.FolderViewSet.as_view()),
+
+    path('folders/files/', views.FileViewSet.as_view()),
     path('folders/<str:slug>/', views.FolderDetailsViewSet.as_view()),
     path('folders/<str:slug>/files/', views.FileViewSet.as_view()), ]

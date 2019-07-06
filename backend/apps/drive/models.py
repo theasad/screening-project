@@ -42,19 +42,22 @@ class Folder(models.Model):
 
 def file_directory_path(instance, filename):
     # This generate a directory where save all uploaded file
-
-    folders = instance.folder.get_parentfolders()
-    parent_folder = list(folders.values_list('slug', flat=True))
-    folder_list = parent_folder+[instance.folder.slug]
-    destination_folder = "/".join(folder_list)
-    return f'drive/{destination_folder}/{filename}'
+    if instance.folder:
+        folders = instance.folder.get_parentfolders()
+        parent_folder = list(folders.values_list('slug', flat=True))
+        folder_list = parent_folder+[instance.folder.slug]
+        destination_folder = "/".join(folder_list)
+        return f'drive/{destination_folder}/{filename}'
+    else:
+        return f'drive/files/{filename}'
 
 
 class File(models.Model):
     folder = models.ForeignKey(
-        Folder, related_name='files', on_delete=models.CASCADE)
+        Folder, related_name='files', on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=255, null=True, blank=True)
     file = models.FileField(
+        max_length=3500,
         upload_to=file_directory_path)
     created = models.DateTimeField(auto_now_add=True)
 

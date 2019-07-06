@@ -13,4 +13,6 @@ class FolderQuerySet(models.QuerySet):
 
 
 class FileQuerySet(models.QuerySet):
-    pass
+        # Get only parent folder
+    def parents_files(self):
+        return self.filter(folder__isnull=True)

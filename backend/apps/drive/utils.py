@@ -97,8 +97,8 @@ def get_media_filesize(file):
 def get_file_icon(request, filename):
     name_split = filename.split('.')
     icon_name = 'file'
-    icon_name = name_split[-1].lower()
     if len(name_split) > 1:
+        icon_name = name_split[-1].lower()
         if icon_name in ['jpg', 'jpeg']:
             icon_name = 'jpg'
         elif icon_name in ['doc', 'docx']:
@@ -108,9 +108,10 @@ def get_file_icon(request, filename):
 
         icon_dir = f"{settings.STATIC_ROOT}/icons/{icon_name}.png"
 
-        # Check file or directory
-        is_file = os.path.exists(icon_dir)
-        if not is_file:
+        # Check icon exist or not
+        is_file_exists = os.path.exists(icon_dir)
+        if not is_file_exists:
             icon_name = 'file'
+
     icon_url = f"{settings.FILE_ICON_URL}{icon_name}.png"
     return request.build_absolute_uri(icon_url)

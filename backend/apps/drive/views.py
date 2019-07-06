@@ -36,8 +36,8 @@ class FileViewSet(generics.ListCreateAPIView):
 
     serializer_class = FileSerializer
 
-    def get_folder_obj(self):
-        slug = self.kwargs.get('slug')
+    def get_folder_obj(self, slug):
+
         try:
             return Folder.objects.get(slug=slug)
         except Folder.DoesNotExist:
@@ -45,6 +45,11 @@ class FileViewSet(generics.ListCreateAPIView):
 
     def get_queryset(self):
         order_by = self.request.GET.get('orderby')
-        folder = self.get_folder_obj()
-        query_set = folder.files.all().order_by(order_by if order_by else '-created')
+        slug = self.kwargs.get('slug')
+        if slug:
+            folder = self.get_folder_obj(slug)
+            query_set = folder.files.all().order_by(order_by if order_by else '-created')
+        else:
+            query_set = File.objects.parents_files().order_by(
+                order_by if order_by else '-created')
         return query_set

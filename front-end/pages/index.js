@@ -73,10 +73,10 @@ class Index extends React.Component {
         const slug = this.props.router.query.slug;
         this.fetchFolders(slug);
 
-        if (typeof slug != "undefined") {
-            const query = this.props.router.query;
-            this.getFiles(slug, query);
-        }
+        // if (typeof slug != "undefined") {
+        const query = this.props.router.query;
+        this.getFiles(typeof slug != "undefined" ? slug : null, query);
+        // }
     }
 
 
@@ -90,17 +90,13 @@ class Index extends React.Component {
 
         if ((prevProps.router.query.slug !== this.props.router.query.slug)) {
             this.fetchFolders(typeof slug != "undefined" ? slug : null);
-            if (typeof slug != "undefined") {
-                this.getFiles(slug, query);
-            } else {
-                this.setState({ files: [] })
-            }
+            this.getFiles(typeof slug != "undefined" ? slug : null, query);
 
-        } else if (typeof slug != "undefined" && (prevProps.router.query.orderBy !== this.props.router.query.orderBy || prevProps.router.query.direction !== this.props.router.query.direction)) {
+        } else if ((prevProps.router.query.orderBy !== this.props.router.query.orderBy || prevProps.router.query.direction !== this.props.router.query.direction)) {
             this.getFiles(slug, query);
         } else if (this.state.isOpenSnackBar && typeof slug == "undefined") {
             this.fetchFolders();
-            this.setState({ files: [] })
+            this.getFiles(null, query);
         }
     }
 
@@ -168,7 +164,7 @@ class Index extends React.Component {
 
 
     // get files
-    getFiles = async (slug, query) => {
+    getFiles = async (slug = null, query) => {
         this._isMounted = true;
         if (this._isMounted) {
             this.setState({ breadCrumItems: this.state.breadCrumItems, isLoading: true, isOpenSnackBar: false });
@@ -178,7 +174,7 @@ class Index extends React.Component {
             orderby: query.direction === 'desc' ? `-${query.orderBy}` : query.orderBy
         }
 
-        let API_URL = `${Config.API_BASE_URL}${slug}/files?`;
+        let API_URL = `${Config.API_BASE_URL}${slug ? `${slug}/` : ''}files?`;
 
         await axios.get(API_URL, {
             params: params

@@ -85,4 +85,4 @@ class FileSerializer(serializers.ModelSerializer):
     #         'parents': serializer.data,
     #         'active': current.data
     #     }
-        return response
+        # return response

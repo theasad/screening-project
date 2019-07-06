@@ -13,13 +13,14 @@ function MyApp(props) {
     enqueueSnackbar(message, {
         variant: variant,
         onClose: hide,
+        autoHideDuration: 1500
     })
     return (<h1 style={{ display: 'none' }}>Snackbar Loading...</h1>)
 
 }
 
 export default function SnackBar(props) {
-    return <SnackbarProvider maxSnack={3}>
+    return <SnackbarProvider maxSnack={10}>
         <MyApp handleSnackBarClose={props.handleSnackBarClose} message={props.message} variant={props.variant} />
     </SnackbarProvider>
 }

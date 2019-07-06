@@ -94,6 +94,7 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { Router } from '../routes'
+import { type } from 'os';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -173,12 +174,17 @@ export default function Files(props) {
     }
     const classes = useStyles();
     const { orderBy, direction } = props;
+    let updateDirection = direction === 'desc' ? 'asc' : 'desc'
     const createSortHandler = (property, order) => event => {
 
-        let updateDirection = direction === 'desc' ? 'asc' : 'desc'
+
         updateDirection = typeof order === "undefined" ? updateDirection : order;
         const updateRouteQuery = { slug: props.folder.slug, orderBy: property, direction: updateDirection }
-        Router.pushRoute('folder', updateRouteQuery)
+        if (typeof props.folder.slug !== "undefined") {
+            Router.pushRoute('folder', updateRouteQuery);
+        } else {
+            Router.pushRoute('home', updateRouteQuery);
+        }
         if (typeof order !== "undefined") {
             setAnchorEl(null);
         }
@@ -226,7 +232,7 @@ export default function Files(props) {
                             <TableSortLabel
                                 active={orderBy === 'name'}
                                 direction={direction}
-                                onClick={createSortHandler('name')}>
+                                onClick={createSortHandler('name', orderBy !== 'name' ? 'asc' : updateDirection)}>
                                 File Name
                             </TableSortLabel>
                         </TableCell>
@@ -235,7 +241,7 @@ export default function Files(props) {
                             <TableSortLabel
                                 active={orderBy === 'created'}
                                 direction={direction}
-                                onClick={createSortHandler('created')}>
+                                onClick={createSortHandler('created', orderBy !== 'created' ? 'asc' : updateDirection)}>
                                 Uploaded At
                             </TableSortLabel>
                         </TableCell>

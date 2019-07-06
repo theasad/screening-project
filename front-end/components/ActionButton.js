@@ -131,7 +131,7 @@ class SpeedDialTooltipOpen extends React.Component {
                     open={open}>
                     {actions.map(action => (
                         <SpeedDialAction
-                            disabled={action.code === 'file' ? this.state.isDisableFileUpload : false}
+                            // disabled={action.code === 'file' ? this.state.isDisableFileUpload : false}
                             key={action.name}
                             icon={action.icon}
                             tooltipTitle={action.name}
