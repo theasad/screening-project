@@ -3,7 +3,7 @@
 ## Technology version:
 | Name                        	| Version 	    |
 |-----------------------------	|-------------- |
-| Python                      	| 3 .6.8      	|
+| Python                      	| 3.6.8      	|
 | Django                      	| 2.2.2       	|
 | Django-rest-framework 	    | 3.9.4       	|
 
