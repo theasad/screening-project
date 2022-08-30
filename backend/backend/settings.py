@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
+
 import os
 import sys
 
@@ -144,5 +145,5 @@ STATICFILES_FINDERS = [
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-FILE_ICON_URL = STATIC_URL+'icons/'
+FILE_ICON_URL = f'{STATIC_URL}icons/'
 CORS_ORIGIN_ALLOW_ALL = True

@@ -28,8 +28,7 @@ class FolderDetailsViewSet(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         slug = self.kwargs.get('slug')
-        queryset = Folder.objects.all()
-        return queryset
+        return Folder.objects.all()
 
 
 class FileViewSet(generics.ListCreateAPIView):
@@ -45,11 +44,8 @@ class FileViewSet(generics.ListCreateAPIView):
 
     def get_queryset(self):
         order_by = self.request.GET.get('orderby')
-        slug = self.kwargs.get('slug')
-        if slug:
+        if slug := self.kwargs.get('slug'):
             folder = self.get_folder_obj(slug)
-            query_set = folder.files.all().order_by(order_by if order_by else '-created')
+            return folder.files.all().order_by(order_by or '-created')
         else:
-            query_set = File.objects.parents_files().order_by(
-                order_by if order_by else '-created')
-        return query_set
+            return File.objects.parents_files().order_by(order_by or '-created')
